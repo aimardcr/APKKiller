@@ -41,20 +41,9 @@
 #include <GLES3/gl3.h>
 
 #include <sys/system_properties.h>
-#include <android_native_app_glue.h>
-
-#include <android\asset_manager.h>
-#include <android\asset_manager_jni.h>
 
 #include <codecvt>
 #include <chrono>
 #include <queue>
 
 using namespace std::chrono_literals;
-
-#define RegisterHook(target, hook, original) Tools::Hook((void *)(target), (void *)(hook), (void **)(original))
-#define WriteBytes(addr, value, size) Tools::WriteAddr((void *)(addr), (void *)(value), (size))
-#define DefineHook(ret, name, args) ret (*orig_##name)args; \
-                                    ret name args
-
-#define PACKAGE_NAME "com.ea.gp.apexlegendsmobilefps"

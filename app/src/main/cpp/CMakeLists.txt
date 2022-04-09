@@ -19,4 +19,4 @@ set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${LINKER_FLAGS}")
 
 add_library(kuro SHARED main.cpp)
 
-target_link_libraries(kuro log)
+target_link_libraries(kuro android log)

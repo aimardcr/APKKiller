@@ -1,4 +1,7 @@
-#include "stdafx.h"
+#include <stdio.h>
+#include <iostream>
+#include <jni.h>
+
 #include "APKKiller.h"
 
 int RegisterFunctions(JNIEnv *env) {
