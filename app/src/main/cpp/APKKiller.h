@@ -4,7 +4,7 @@
 
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, "APKKiller", __VA_ARGS__)
 
-#define apk_asset_path "original.apk" // Assets/original.apk
+#define apk_asset_path "original.apk" // assets/original.apk
 #define apk_fake_name "original.apk" // /data/data/<package_name/cache/original.apk
 std::vector<std::vector<uint8_t>> apk_signatures {{}}; // Use APKSignReader to replace this
 
