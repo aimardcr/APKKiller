@@ -7,10 +7,13 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <dlfcn.h>
 
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
 #include <android/log.h>
+
+#include "ElfImg.h"
 
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, "APKKiller", __VA_ARGS__)
 
@@ -29,7 +32,7 @@ namespace APKKiller {
         jobject reference;
     public:
         Reference(jobject reference) {
-            this->reference = reference;
+            this->reference = g_env->NewGlobalRef(reference);
         }
 
         jobject getObj() {
@@ -54,7 +57,7 @@ namespace APKKiller {
         jobject arrayList;
     public:
         ArrayList(jobject arrayList) {
-            this->arrayList = arrayList;
+            this->arrayList = g_env->NewGlobalRef(arrayList);
         }
 
         jobject getObj() {
@@ -79,7 +82,7 @@ namespace APKKiller {
         jobject arrayMap;
     public:
         ArrayMap(jobject arrayMap) {
-            this->arrayMap = arrayMap;
+            this->arrayMap = g_env->NewGlobalRef(arrayMap);
         }
 
         jobject getObj() {
@@ -108,7 +111,7 @@ namespace APKKiller {
         jobject field;
     public:
         Field(jobject field) {
-            this->field = field;
+            this->field = g_env->NewGlobalRef(field);
         }
 
         jobject getField() {
@@ -133,7 +136,7 @@ namespace APKKiller {
         jobject method;
     public:
         Method(jobject method) {
-            this->method = method;
+            this->method = g_env->NewGlobalRef(method);
         }
 
         jobject getMethod() {
@@ -154,7 +157,7 @@ namespace APKKiller {
         jobject clazz;
     public:
         Class(jobject clazz) {
-            this->clazz = clazz;
+            this->clazz = g_env->NewGlobalRef(clazz);
         }
 
         jobject getClass() {
@@ -180,6 +183,11 @@ namespace APKKiller {
 
             auto field = new Field(g_env->CallObjectMethod(clazz, getDeclaredFieldMethod, str));
 
+            if (g_env->ExceptionCheck()) {
+                g_env->ExceptionDescribe();
+                g_env->ExceptionClear();
+            }
+
             return field;
         }
 
@@ -190,6 +198,11 @@ namespace APKKiller {
             auto getDeclaredMethodMethod = g_env->GetMethodID(classClass, "getDeclaredMethod", "(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;");
 
             auto method = new Method(g_env->CallObjectMethod(clazz, getDeclaredMethodMethod, str, args));
+
+            if (g_env->ExceptionCheck()) {
+                g_env->ExceptionDescribe();
+                g_env->ExceptionClear();
+            }
 
             return method;
         }
@@ -400,6 +413,19 @@ void patch_PackageManager(jobject obj) {
     mPMField->set(pm, proxy);
 }
 
+void bypassRestriction(JNIEnv *env) {
+    ElfImg art("libart.so");
+    auto setHiddenApiExemptionsMethod =
+            (void (*)(JNIEnv*, jobject, jobjectArray))art.getSymbolAddress("_ZN3artL32VMRuntime_setHiddenApiExemptionsEP7_JNIEnvP7_jclassP13_jobjectArray");
+
+    auto objectClass = env->FindClass("java/lang/Object");
+    auto objectArray = env->NewObjectArray(1, objectClass, NULL);
+    env->SetObjectArrayElement(objectArray, 0, env->NewStringUTF("L"));
+
+    auto VMRuntimeClass = env->FindClass("dalvik/system/VMRuntime");
+    setHiddenApiExemptionsMethod(env, VMRuntimeClass, objectArray);
+}
+
 void APKKill(JNIEnv *env, jclass clazz, jobject context) {
     LOGI("-------- Killing APK");
 
@@ -425,6 +451,8 @@ void APKKill(JNIEnv *env, jclass clazz, jobject context) {
     }
 
     APKKiller::g_apkPath = (jstring) env->NewGlobalRef(g_env->NewStringUTF(apkPath.c_str()));
+
+    bypassRestriction(env);
 
     auto activityThreadClass = Class::forName("android.app.ActivityThread");
     auto sCurrentActivityThreadField = activityThreadClass->getDeclaredField("sCurrentActivityThread");
@@ -522,46 +550,44 @@ jobject nativeInvoke(JNIEnv *env, jclass clazz, jobject proxy, jobject method, j
                 }
                 return packageInfo;
             } else if ((flags & 0x8000000) != 0) {
-                if (getAPILevel() < 31) {
-                    auto packageInfo = Method_invoke(method, g_packageManager, args);
-                    if (packageInfo) {
-                        auto packageInfoClass = Class::forName("android.content.pm.PackageInfo");
-                        auto applicationInfoField = packageInfoClass->getDeclaredField("applicationInfo");
-                        applicationInfoField->setAccessible(true);
-                        auto applicationInfo = applicationInfoField->get(packageInfo);
-                        if (applicationInfo) {
-                            patch_ApplicationInfo(applicationInfo);
-                        }
-                        applicationInfoField->set(packageInfo, applicationInfo);
-                        auto signingInfoField = packageInfoClass->getDeclaredField("signingInfo");
-                        signingInfoField->setAccessible(true);
-                        auto signingInfo = signingInfoField->get(packageInfo);
-
-                        auto signingInfoClass = Class::forName("android.content.pm.SigningInfo");
-                        auto mSigningDetailsField = signingInfoClass->getDeclaredField("mSigningDetails");
-                        mSigningDetailsField->setAccessible(true);
-                        auto mSigningDetails = mSigningDetailsField->get(signingInfo);
-
-                        auto signingDetailsClass = Class::forName("android.content.pm.PackageParser$SigningDetails");
-                        auto signaturesField = signingDetailsClass->getDeclaredField("signatures");
-                        signaturesField->setAccessible(true);
-                        auto pastSigningCertificatesField = signingDetailsClass->getDeclaredField("pastSigningCertificates");
-                        pastSigningCertificatesField->setAccessible(true);
-
-                        auto signatureClass = env->FindClass("android/content/pm/Signature");
-                        auto signatureConstructor = env->GetMethodID(signatureClass, "<init>", "([B)V");
-                        auto signatureArray = env->NewObjectArray(apk_signatures.size(), signatureClass, NULL);
-                        for (int i = 0; i < apk_signatures.size(); i++) {
-                            auto signature = env->NewByteArray(apk_signatures[i].size());
-                            env->SetByteArrayRegion(signature, 0, apk_signatures[i].size(), (jbyte *) apk_signatures[i].data());
-                            env->SetObjectArrayElement(signatureArray, i, env->NewObject(signatureClass, signatureConstructor, signature));
-                        }
-
-                        signaturesField->set(mSigningDetails, signatureArray);
-                        pastSigningCertificatesField->set(mSigningDetails, signatureArray);
+                auto packageInfo = Method_invoke(method, g_packageManager, args);
+                if (packageInfo) {
+                    auto packageInfoClass = Class::forName("android.content.pm.PackageInfo");
+                    auto applicationInfoField = packageInfoClass->getDeclaredField("applicationInfo");
+                    applicationInfoField->setAccessible(true);
+                    auto applicationInfo = applicationInfoField->get(packageInfo);
+                    if (applicationInfo) {
+                        patch_ApplicationInfo(applicationInfo);
                     }
-                    return packageInfo;
-                } else return 0;
+                    applicationInfoField->set(packageInfo, applicationInfo);
+                    auto signingInfoField = packageInfoClass->getDeclaredField("signingInfo");
+                    signingInfoField->setAccessible(true);
+                    auto signingInfo = signingInfoField->get(packageInfo);
+
+                    auto signingInfoClass = Class::forName("android.content.pm.SigningInfo");
+                    auto mSigningDetailsField = signingInfoClass->getDeclaredField("mSigningDetails");
+                    mSigningDetailsField->setAccessible(true);
+                    auto mSigningDetails = mSigningDetailsField->get(signingInfo);
+
+                    auto signingDetailsClass = Class::forName("android.content.pm.PackageParser$SigningDetails");
+                    auto signaturesField = signingDetailsClass->getDeclaredField("signatures");
+                    signaturesField->setAccessible(true);
+                    auto pastSigningCertificatesField = signingDetailsClass->getDeclaredField("pastSigningCertificates");
+                    pastSigningCertificatesField->setAccessible(true);
+
+                    auto signatureClass = env->FindClass("android/content/pm/Signature");
+                    auto signatureConstructor = env->GetMethodID(signatureClass, "<init>", "([B)V");
+                    auto signatureArray = env->NewObjectArray(apk_signatures.size(), signatureClass, NULL);
+                    for (int i = 0; i < apk_signatures.size(); i++) {
+                        auto signature = env->NewByteArray(apk_signatures[i].size());
+                        env->SetByteArrayRegion(signature, 0, apk_signatures[i].size(), (jbyte *) apk_signatures[i].data());
+                        env->SetObjectArrayElement(signatureArray, i, env->NewObject(signatureClass, signatureConstructor, signature));
+                    }
+
+                    signaturesField->set(mSigningDetails, signatureArray);
+                    pastSigningCertificatesField->set(mSigningDetails, signatureArray);
+                }
+                return packageInfo;
             } else {
                 auto packageInfo = Method_invoke(method, g_packageManager, args);
                 if (packageInfo) {
