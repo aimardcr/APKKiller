@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.8)
 
+add_subdirectory(whale)
+
 set(CMAKE_CXX_STANDARD 17)
 
 set(LINKER_FLAGS "-ffixed-x18 -Wl,--hash-style=both")
@@ -17,7 +19,10 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${C_FLAGS} ${CXX_FLAGS} -O0")
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${LINKER_FLAGS}")
 set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${LINKER_FLAGS}")
 
-add_library(kuro SHARED main.cpp
+include_directories(whale/include)
+
+add_library(kuro SHARED
+        main.cpp
         ElfImg.cpp)
 
-target_link_libraries(kuro android log)
+target_link_libraries(kuro whale android log)

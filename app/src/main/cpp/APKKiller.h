@@ -13,6 +13,7 @@
 #include <android/asset_manager_jni.h>
 #include <android/log.h>
 
+#include <whale.h>
 #include "ElfImg.h"
 
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, "APKKiller", __VA_ARGS__)
@@ -25,6 +26,7 @@ namespace APKKiller {
     JNIEnv *g_env;
     jstring g_apkPath;
     jobject g_packageManager;
+    jobject g_proxy;
     std::string g_apkPkg;
 
     class Reference {
@@ -141,6 +143,10 @@ namespace APKKiller {
 
         jobject getMethod() {
             return method;
+        }
+
+        jstring getName() {
+            return (jstring) g_env->CallObjectMethod(method, g_env->GetMethodID(g_env->FindClass("java/lang/reflect/Method"), "getName", "()Ljava/lang/String;"));
         }
 
         void setAccessible(jboolean accessible) {
@@ -328,6 +334,10 @@ void patch_ContextImpl(jobject obj) {
         auto contextImplClass = Class::forName("android.app.ContextImpl");
         auto mPackageInfoField = contextImplClass->getDeclaredField("mPackageInfo");
         mPackageInfoField->setAccessible(true);
+
+        auto mPackageManagerField = contextImplClass->getDeclaredField("mPackageManager");
+        mPackageManagerField->setAccessible(true);
+        mPackageManagerField->set(obj, g_proxy);
     }
 }
 
@@ -403,20 +413,28 @@ void patch_PackageManager(jobject obj) {
 
     auto proxyClass = g_env->FindClass("java/lang/reflect/Proxy");
     auto newProxyInstanceMethod = g_env->GetStaticMethodID(proxyClass, "newProxyInstance", "(Ljava/lang/ClassLoader;[Ljava/lang/Class;Ljava/lang/reflect/InvocationHandler;)Ljava/lang/Object;");
-    auto proxy = g_env->CallStaticObjectMethod(proxyClass, newProxyInstanceMethod, classLoader, classArray, myInvocationHandler);
+    g_proxy = g_env->NewGlobalRef(g_env->CallStaticObjectMethod(proxyClass, newProxyInstanceMethod, classLoader, classArray, myInvocationHandler));
 
-    sPackageManagerField->set(sCurrentActivityThread, proxy);
+    sPackageManagerField->set(sCurrentActivityThread, g_proxy);
 
     auto pm = getPackageManager(obj);
     auto mPMField = Class::forName("android.app.ApplicationPackageManager")->getDeclaredField("mPM");
     mPMField->setAccessible(true);
-    mPMField->set(pm, proxy);
+    mPMField->set(pm, g_proxy);
 }
 
-void bypassRestriction(JNIEnv *env) {
+bool (*orig_IsInstanceOf)(JNIEnv *env, jobject obj, jclass clazz);
+bool IsInstanceOf(JNIEnv *env, jobject obj, jclass clazz) {
+    jclass proxyClass = env->FindClass("java/lang/reflect/Proxy");
+    if (clazz == proxyClass) {
+        return false;
+    }
+    return orig_IsInstanceOf(env, obj, clazz);
+}
+
+void doBypass(JNIEnv *env) {
     ElfImg art("libart.so");
-    auto setHiddenApiExemptionsMethod =
-            (void (*)(JNIEnv*, jobject, jobjectArray))art.getSymbolAddress("_ZN3artL32VMRuntime_setHiddenApiExemptionsEP7_JNIEnvP7_jclassP13_jobjectArray");
+    auto setHiddenApiExemptionsMethod = (void (*)(JNIEnv*, jobject, jobjectArray)) art.getSymbolAddress("_ZN3artL32VMRuntime_setHiddenApiExemptionsEP7_JNIEnvP7_jclassP13_jobjectArray");
 
     auto objectClass = env->FindClass("java/lang/Object");
     auto objectArray = env->NewObjectArray(1, objectClass, NULL);
@@ -424,6 +442,9 @@ void bypassRestriction(JNIEnv *env) {
 
     auto VMRuntimeClass = env->FindClass("dalvik/system/VMRuntime");
     setHiddenApiExemptionsMethod(env, VMRuntimeClass, objectArray);
+
+    auto IsInstanceOfMethod = (void *) art.getSymbolAddress("_ZN3art3JNI12IsInstanceOfEP7_JNIEnvP8_jobjectP7_jclass");
+    WInlineHookFunction(IsInstanceOfMethod, (void *) IsInstanceOf, (void **) &orig_IsInstanceOf);
 }
 
 void APKKill(JNIEnv *env, jclass clazz, jobject context) {
@@ -452,7 +473,7 @@ void APKKill(JNIEnv *env, jclass clazz, jobject context) {
 
     APKKiller::g_apkPath = (jstring) env->NewGlobalRef(g_env->NewStringUTF(apkPath.c_str()));
 
-    bypassRestriction(env);
+    doBypass(env);
 
     auto activityThreadClass = Class::forName("android.app.ActivityThread");
     auto sCurrentActivityThreadField = activityThreadClass->getDeclaredField("sCurrentActivityThread");
@@ -507,25 +528,21 @@ void APKKill(JNIEnv *env, jclass clazz, jobject context) {
 jobject nativeInvoke(JNIEnv *env, jclass clazz, jobject proxy, jobject method, jobjectArray args) {
     g_env = env;
 
-    auto Method_getName = [env](jobject method) {
-        return env->CallObjectMethod(method, env->GetMethodID(env->FindClass("java/lang/reflect/Method"), "getName", "()Ljava/lang/String;"));
-    };
-
-    auto Method_invoke = [env](jobject method, jobject obj, jobjectArray args) {
-        return env->CallObjectMethod(method, env->GetMethodID(env->FindClass("java/lang/reflect/Method"), "invoke", "(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"), obj, args);
-    };
-
     auto Integer_intValue = [env](jobject integer) {
         return env->CallIntMethod(integer, env->GetMethodID(env->FindClass("java/lang/Integer"), "intValue", "()I"));
     };
 
-    const char *Name = env->GetStringUTFChars((jstring) Method_getName(method), NULL);
+    Method *mMethod = new Method(method);
+    auto mName = mMethod->getName();
+
+    const char *Name = env->GetStringUTFChars(mName, NULL);
+    env->DeleteLocalRef(mName);
     if (!strcmp(Name, "getPackageInfo")) {
         const char *packageName = env->GetStringUTFChars((jstring) env->GetObjectArrayElement(args, 0), NULL);
         int flags = Integer_intValue(env->GetObjectArrayElement(args, 1));
         if (!strcmp(packageName, g_apkPkg.c_str())) {
             if ((flags & 0x40) != 0) {
-                auto packageInfo = Method_invoke(method, g_packageManager, args);
+                auto packageInfo = mMethod->invoke(g_packageManager, args);
                 if (packageInfo) {
                     auto packageInfoClass = Class::forName("android.content.pm.PackageInfo");
                     auto applicationInfoField = packageInfoClass->getDeclaredField("applicationInfo");
@@ -550,7 +567,7 @@ jobject nativeInvoke(JNIEnv *env, jclass clazz, jobject proxy, jobject method, j
                 }
                 return packageInfo;
             } else if ((flags & 0x8000000) != 0) {
-                auto packageInfo = Method_invoke(method, g_packageManager, args);
+                auto packageInfo = mMethod->invoke(g_packageManager, args);
                 if (packageInfo) {
                     auto packageInfoClass = Class::forName("android.content.pm.PackageInfo");
                     auto applicationInfoField = packageInfoClass->getDeclaredField("applicationInfo");
@@ -589,7 +606,7 @@ jobject nativeInvoke(JNIEnv *env, jclass clazz, jobject proxy, jobject method, j
                 }
                 return packageInfo;
             } else {
-                auto packageInfo = Method_invoke(method, g_packageManager, args);
+                auto packageInfo = mMethod->invoke(g_packageManager, args);
                 if (packageInfo) {
                     auto packageInfoClass = Class::forName("android.content.pm.PackageInfo");
                     auto applicationInfoField = packageInfoClass->getDeclaredField("applicationInfo");
@@ -605,12 +622,12 @@ jobject nativeInvoke(JNIEnv *env, jclass clazz, jobject proxy, jobject method, j
     } else if (!strcmp(Name, "getApplicationInfo")) {
         const char *packageName = env->GetStringUTFChars((jstring) env->GetObjectArrayElement(args, 0), NULL);
         if (!strcmp(packageName, g_apkPkg.c_str())) {
-            auto applicationInfo = Method_invoke(method, g_packageManager, args);
+            auto applicationInfo = mMethod->invoke(g_packageManager, args);
             if (applicationInfo) {
                 patch_ApplicationInfo(applicationInfo);
             }
             return applicationInfo;
         }
     }
-    return Method_invoke(method, g_packageManager, args);
+    return mMethod->invoke(g_packageManager, args);
 }
