@@ -1,18 +1,11 @@
-#include <stdio.h>
 #include <iostream>
 #include <jni.h>
 
 #include "APKKiller.h"
 
 int RegisterFunctions(JNIEnv *env) {
-    JNINativeMethod methods[2];
-    methods[0].name = "Start";
-    methods[0].signature = "(Landroid/content/Context;)V";
-    methods[0].fnPtr = (void *) APKKill;
-
-    methods[1].name = "nativeInvoke";
-    methods[1].signature = "(Ljava/lang/Object;Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;";
-    methods[1].fnPtr = (void *) nativeInvoke;
+    JNINativeMethod methods[] = {{"Start", "(Landroid/content/Context;)V", (void *) APKKill},
+                                 {"nativeInvoke", "(Ljava/lang/Object;Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;", (void *) nativeInvoke}};
 
     jclass clazz = env->FindClass("com/kuro/APKKiller");
     if (!clazz)
@@ -33,5 +26,6 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     if (RegisterFunctions(env) != 0) {
         return -1;
     }
+
     return JNI_VERSION_1_6;
 }
