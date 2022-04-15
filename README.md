@@ -6,7 +6,7 @@ You can't access those information using normal code, but with _Reflection_ you 
 
 APKKiller uses the advantage of _Reflection_ to access hidden information of the android app such as _Application Signature_ or _Application APK Path_ and replace it with a new data so that the application thinks its _Signature_ is still the original one even when the APK file is already being tampered and resigned using a new signature.
 # How to use it?
-1. Get the target app original _Signature_ using [APKSignReader for Android](https://github.com/aimardcr/APKSignReader) or [APKSignReader for Windows (Only supports for v1 Signature Scheme)](https://github.com/aimardcr/CS-APKSignReader)
+1. Get the target app original _Signature_ using [APKSignReader](https://github.com/aimardcr/APKSignReader)
 2. Change **apk_signatures** in `APKKiller.h` using the resuslt of _APKSignReader_
 3. Build the APKKiller Project to APK
 4. Decompile both APKKiller APK and Target APK
