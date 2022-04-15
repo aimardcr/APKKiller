@@ -6,7 +6,7 @@
 int RegisterFunctions(JNIEnv *env) {
     JNINativeMethod methods[] = {
             {"Start", "(Landroid/content/Context;)V", (void *) APKKill},
-            {"nativeInvoke", "(Ljava/lang/Object;Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;", (void *) nativeInvoke}
+            {"processInvoke", "(Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;", (void *) processInvoke}
     };
 
     jclass clazz = env->FindClass("com/kuro/APKKiller");
