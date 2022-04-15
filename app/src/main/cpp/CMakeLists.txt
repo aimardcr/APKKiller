@@ -23,6 +23,8 @@ include_directories(whale/include)
 
 add_library(kuro SHARED
         main.cpp
+        BinaryReader.cpp
+        Utils.cpp
         ElfImg.cpp)
 
 target_link_libraries(kuro whale android log)

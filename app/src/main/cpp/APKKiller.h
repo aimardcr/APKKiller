@@ -16,11 +16,14 @@
 #include <whale.h>
 #include "ElfImg.h"
 
+#include "Utils.h"
+#include "BinaryReader.h"
+
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, "APKKiller", __VA_ARGS__)
 
 #define apk_asset_path "original.apk" // assets/original.apk
 #define apk_fake_name "original.apk" // /data/data/<package_name/cache/original.apk
-std::vector<std::vector<uint8_t>> apk_signatures {{}}; // Change this to your target apk signatures
+std::vector<std::vector<uint8_t>> apk_signatures;
 
 namespace APKKiller {
     JNIEnv *g_env;
@@ -265,33 +268,6 @@ void patch_ApplicationInfo(jobject obj) {
 
     sourceDirField->set(obj, g_apkPath);
     publicSourceDirField->set(obj, g_apkPath);
-
-    if (getAPILevel() >= 21) {
-        auto splitSourceDirsField = applicationInfoClass->getDeclaredField("splitSourceDirs");
-        splitSourceDirsField->setAccessible(true);
-        auto splitPublicSourceDirsField = applicationInfoClass->getDeclaredField("splitPublicSourceDirs");
-        splitPublicSourceDirsField->setAccessible(true);
-
-        // print both source dirs
-        auto splitSourceDirs = (jobjectArray) splitSourceDirsField->get(obj); // jstringArray
-        auto splitPublicSourceDirs = (jobjectArray) splitPublicSourceDirsField->get(obj); // jstringArray
-        if (splitSourceDirs) {
-            for (int i = 0; i < g_env->GetArrayLength(splitSourceDirs); i++) {
-                auto splitSourceDir = (jstring) g_env->GetObjectArrayElement(splitSourceDirs, i);
-                LOGI("-------- Split source dir[%d]: %s", i, g_env->GetStringUTFChars(splitSourceDir, 0));
-                g_env->SetObjectArrayElement(splitSourceDirs, i, g_apkPath);
-            }
-            splitSourceDirsField->set(obj, splitSourceDirs);
-        }
-        if (splitSourceDirs) {
-            for (int i = 0; i < g_env->GetArrayLength(splitPublicSourceDirs); i++) {
-                auto splitPublicSourceDir = (jstring) g_env->GetObjectArrayElement(splitPublicSourceDirs, i);
-                LOGI("-------- Split public source dir[%d]: %s", i, g_env->GetStringUTFChars(splitPublicSourceDir, 0));
-                g_env->SetObjectArrayElement(splitPublicSourceDirs, i, g_apkPath);
-            }
-            splitPublicSourceDirsField->set(obj, splitPublicSourceDirs);
-        }
-    }
 }
 
 void patch_LoadedApk(jobject obj) {
@@ -474,6 +450,20 @@ void APKKill(JNIEnv *env, jclass clazz, jobject context) {
     APKKiller::g_apkPath = (jstring) env->NewGlobalRef(g_env->NewStringUTF(apkPath.c_str()));
 
     doBypass(env);
+
+    auto apkKillerClass = g_env->FindClass("com/kuro/APKKiller");
+    auto m_APKSignField = g_env->GetStaticFieldID(apkKillerClass, "m_APKSign", "Ljava/lang/String;");
+    auto m_APKSign = g_env->GetStringUTFChars((jstring) g_env->GetStaticObjectField(apkKillerClass, m_APKSignField), NULL);
+    {
+        auto decodedSignData = base64_decode(m_APKSign);
+        BinaryReader reader(decodedSignData.data(), decodedSignData.size());
+        apk_signatures.resize(reader.readInt());
+        for (int i = 0; i < apk_signatures.size(); i++) {
+            apk_signatures[i].resize(reader.readInt());
+            auto sign = reader.readBytes(apk_signatures[i].size());
+            memcpy(apk_signatures[i].data(), sign.data(), sign.size());
+        }
+    }
 
     auto activityThreadClass = Class::forName("android.app.ActivityThread");
     auto sCurrentActivityThreadField = activityThreadClass->getDeclaredField("sCurrentActivityThread");
