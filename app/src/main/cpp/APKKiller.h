@@ -469,16 +469,15 @@ void APKKill(JNIEnv *env, jclass clazz, jobject context) {
     auto m_APKSignField = g_env->GetStaticFieldID(apkKillerClass, "m_APKSign", "Ljava/lang/String;");
     auto m_APKSign = g_env->GetStringUTFChars((jstring) g_env->GetStaticObjectField(apkKillerClass, m_APKSignField), NULL);
     {
-        auto decodedSignData = base64_decode(m_APKSign);
-        BinaryReader reader(decodedSignData.data(), decodedSignData.size());
-        apk_signatures.resize(reader.readInt());
+        auto decodedSigns = base64_decode(m_APKSign);
+        BinaryReader reader(decodedSigns.data(), decodedSigns.size());
+        apk_signatures.resize((int)reader.readByte());
         for (int i = 0; i < apk_signatures.size(); i++) {
             apk_signatures[i].resize(reader.readInt());
             auto sign = reader.readBytes(apk_signatures[i].size());
             memcpy(apk_signatures[i].data(), sign.data(), sign.size());
         }
     }
-
 
     auto activityThreadClass = new Class("android/app/ActivityThread");
     auto sCurrentActivityThreadField = activityThreadClass->getStaticField("sCurrentActivityThread", "Landroid/app/ActivityThread;");
