@@ -465,7 +465,7 @@ void APKKill(JNIEnv *env, jclass clazz, jobject context) {
 
     doBypass(env);
 
-    if (!apk_signatures.empty()) {
+    if (apk_signatures.empty()) {
         auto apkKillerClass = g_env->FindClass("com/kuro/APKKiller");
         auto m_APKSignField = g_env->GetStaticFieldID(apkKillerClass, "m_APKSign", "Ljava/lang/String;");
         auto m_APKSign = g_env->GetStringUTFChars((jstring) g_env->GetStaticObjectField(apkKillerClass, m_APKSignField), NULL);
