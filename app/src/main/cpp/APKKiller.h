@@ -413,28 +413,17 @@ void patch_PackageManager(jobject obj) {
     mPMField->set(pm, g_proxy);
 }
 
-bool (*orig_IsInstanceOf)(JNIEnv *env, jobject obj, jclass clazz);
-bool IsInstanceOf(JNIEnv *env, jobject obj, jclass clazz) {
-    jclass proxyClass = env->FindClass("java/lang/reflect/Proxy");
-    if (clazz == proxyClass) {
-        return false;
-    }
-    return orig_IsInstanceOf(env, obj, clazz);
-}
-
 void doBypass(JNIEnv *env) {
     ElfImg art("libart.so");
     auto setHiddenApiExemptionsMethod = (void (*)(JNIEnv*, jobject, jobjectArray)) art.getSymbolAddress("_ZN3artL32VMRuntime_setHiddenApiExemptionsEP7_JNIEnvP7_jclassP13_jobjectArray");
+    if (setHiddenApiExemptionsMethod != nullptr) {
+        auto objectClass = env->FindClass("java/lang/Object");
+        auto objectArray = env->NewObjectArray(1, objectClass, NULL);
+        env->SetObjectArrayElement(objectArray, 0, env->NewStringUTF("L"));
 
-    auto objectClass = env->FindClass("java/lang/Object");
-    auto objectArray = env->NewObjectArray(1, objectClass, NULL);
-    env->SetObjectArrayElement(objectArray, 0, env->NewStringUTF("L"));
-
-    auto VMRuntimeClass = env->FindClass("dalvik/system/VMRuntime");
-    setHiddenApiExemptionsMethod(env, VMRuntimeClass, objectArray);
-
-    /*auto IsInstanceOfMethod = (void *) art.getSymbolAddress("_ZN3art3JNI12IsInstanceOfEP7_JNIEnvP8_jobjectP7_jclass");
-    WInlineHookFunction(IsInstanceOfMethod, (void *) IsInstanceOf, (void **) &orig_IsInstanceOf);*/
+        auto VMRuntimeClass = env->FindClass("dalvik/system/VMRuntime");
+        setHiddenApiExemptionsMethod(env, VMRuntimeClass, objectArray);
+    }
 }
 
 void APKKill(JNIEnv *env, jclass clazz, jobject context) {
