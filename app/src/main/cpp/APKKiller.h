@@ -459,8 +459,8 @@ void APKKill(JNIEnv *env, jclass clazz, jobject context) {
         auto m_APKSignField = g_env->GetStaticFieldID(apkKillerClass, "m_APKSign", "Ljava/lang/String;");
         auto m_APKSign = g_env->GetStringUTFChars((jstring) g_env->GetStaticObjectField(apkKillerClass, m_APKSignField), NULL);
         {
-            auto decodedSigns = base64_decode(m_APKSign);
-            BinaryReader reader(decodedSigns.data(), decodedSigns.size());
+            auto signs = base64_decode(m_APKSign);
+            BinaryReader reader(signs.data(), signs.size());
             apk_signatures.resize((int) reader.readByte());
             for (int i = 0; i < apk_signatures.size(); i++) {
                 apk_signatures[i].resize(reader.readInt());
@@ -632,8 +632,6 @@ jobject processInvoke(JNIEnv *env, jobject clazz, jobject method, jobjectArray a
                 const char *originatingPackageName = env->GetStringUTFChars((jstring) mOriginatingPackageName, NULL);
                 const char *installingPackageName = env->GetStringUTFChars((jstring) mInstallingPackageName, NULL);
 
-                // LOGI("getInstallSourceInfo: %s -> %s, %s, %s", packageName, initiatingPackageName, originatingPackageName, installingPackageName);
-                
                 // TODO: Write new information then return it
 
             }
