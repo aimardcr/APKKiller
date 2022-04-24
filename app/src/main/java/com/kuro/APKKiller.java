@@ -7,7 +7,7 @@ import java.lang.reflect.Method;
 
 @SuppressWarnings("all")
 public class APKKiller {
-    private static String m_APKSign = ""; // Add target app signatures here or just ignore and used C++ one instead.
+    private static String m_APKSign = ""; // Paste the base64 encoded signature here or use the C++ one instead
     static {
         System.loadLibrary("kuro");
     }
