@@ -167,7 +167,7 @@ namespace APKKiller {
         }
     };
 
-    // This is for Java Reflection Method
+    // This is for Java Reflection Method, so getMethod and getStaticMethod in Class class is not used here.
     class Method {
     private:
         jobject method;
@@ -231,6 +231,26 @@ namespace APKKiller {
             }
             LOGI("Field %s(%s): %p", fieldName, fieldSig, field);
             return new Field(clazz, field, true);
+        }
+
+        jmethodID getMethod(const char *methodName, const char *methodSig) {
+            auto method = g_env->GetMethodID(clazz, methodName, methodSig);
+            if (g_env->ExceptionCheck()) {
+                g_env->ExceptionDescribe();
+                g_env->ExceptionClear();
+            }
+            LOGI("Method %s(%s): %p", methodName, methodSig, method);
+            return method;
+        }
+
+        jmethodID getStaticMethod(const char *methodName, const char *methodSig) {
+            auto method = g_env->GetStaticMethodID(clazz, methodName, methodSig);
+            if (g_env->ExceptionCheck()) {
+                g_env->ExceptionDescribe();
+                g_env->ExceptionClear();
+            }
+            LOGI("Method %s(%s): %p", methodName, methodSig, method);
+            return method;
         }
     };
 }
@@ -404,7 +424,9 @@ void doBypass(JNIEnv *env) {
         env->SetObjectArrayElement(objectArray, 0, env->NewStringUTF("L"));
 
         auto VMRuntimeClass = env->FindClass("dalvik/system/VMRuntime");
-        setHiddenApiExemptionsMethod(env, VMRuntimeClass, objectArray);
+        auto getRuntimeMethod = env->GetStaticMethodID(VMRuntimeClass, "getRuntime", "()Ldalvik/system/VMRuntime;");
+        auto runtime = env->CallStaticObjectMethod(VMRuntimeClass, getRuntimeMethod);
+        setHiddenApiExemptionsMethod(env, runtime, objectArray);
     }
 }
 
