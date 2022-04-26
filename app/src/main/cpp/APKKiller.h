@@ -111,14 +111,6 @@ namespace APKKiller {
             return arrayMap;
         }
 
-        jobject keyAt(int index) {
-            auto arrayMapClass = g_env->FindClass("android/util/ArrayMap");
-            auto keyAtMethod = g_env->GetMethodID(arrayMapClass, "keyAt", "(I)Ljava/lang/Object;");
-            auto result = g_env->CallObjectMethod(arrayMap, keyAtMethod, index);
-            g_env->DeleteLocalRef(arrayMapClass);
-            return result;
-        }
-
         jobject valueAt(int index) {
             auto arrayMapClass = g_env->FindClass("android/util/ArrayMap");
             auto valueAtMethod = g_env->GetMethodID(arrayMapClass, "valueAt", "(I)Ljava/lang/Object;");
@@ -245,16 +237,6 @@ namespace APKKiller {
 
 using namespace APKKiller;
 
-int getAPILevel() {
-    static int api_level = -1;
-    if (api_level == -1) {
-        char prop_value[256];
-        __system_property_get("ro.build.version.sdk", prop_value);
-        api_level = atoi(prop_value);
-    }
-    return api_level;
-}
-
 jobject getApplicationContext(jobject obj) {
     auto contextWrapperClass = g_env->FindClass("android/content/ContextWrapper");
     auto getApplicationContextMethod = g_env->GetMethodID(contextWrapperClass, "getApplicationContext", "()Landroid/content/Context;");
@@ -344,7 +326,7 @@ void patch_Application(jobject obj) {
         patch_LoadedApk(mLoadedApkField->get(obj));
     }
 
-    patch_ContextImpl(getApplicationContext(obj));
+    // patch_ContextImpl(getApplicationContext(obj));
 }
 
 AAssetManager *g_assetManager;
@@ -514,7 +496,7 @@ void APKKill(JNIEnv *env, jclass clazz, jobject context) {
     }
     mResourcePackagesField->set(sCurrentActivityThread, map->getObj());
 
-    patch_ContextImpl(context);
+    // patch_ContextImpl(context); // This line crashes on some games.
     patch_PackageManager(context);
 }
 
