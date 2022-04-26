@@ -61,7 +61,7 @@ bool ArtRuntime::OnLoad(JavaVM *vm, JNIEnv *env, jclass java_class) {
         art_path = kLibArtPath_Q;
     else
         art_path = kLibArtPath;
-    art_elf_image_ = WDynamicLibOpen(art_path);
+    void* art_elf_image_ = WDynamicLibOpen(art_path);
     if (art_elf_image_ == nullptr) {
         LOG(ERROR) << "Unable to read data from libart.so.";
         return false;
@@ -77,8 +77,8 @@ bool ArtRuntime::OnLoad(JavaVM *vm, JNIEnv *env, jclass java_class) {
                                                                     : kPointerSize;
     u4 expected_access_flags = kAccPrivate | kAccStatic | kAccNative;
     if (api_level_ >= ANDROID_Q)
-            expected_access_flags |= kAccPublicApi;
-    hookEncodeArtMethod();
+        expected_access_flags |= kAccPublicApi;
+    hookEncodeArtMethod(art_elf_image_);
     jmethodID reserved0 = env->GetStaticMethodID(java_class, kMethodReserved0, "()V");
     jmethodID reserved1 = env->GetStaticMethodID(java_class, kMethodReserved1, "()V");
 
@@ -184,11 +184,11 @@ bool ArtRuntime::OnLoad(JavaVM *vm, JNIEnv *env, jclass java_class) {
     CHECK_FIELD(quick_generic_jni_trampoline, nullptr)
     class_linker_objects_.quick_generic_jni_trampoline_ = quick_generic_jni_trampoline;
 
+    hookGetOatQuickMethodHeader(art_elf_image_);
+
+    WDynamicLibClose(art_elf_image_);
     pthread_mutex_init(&mutex, nullptr);
-    EnforceDisableHiddenAPIPolicy();
-    if (api_level_ >= ANDROID_N) {
-        FixBugN();
-    }
+//    EnforceDisableHiddenAPIPolicy();
     return true;
 
 #undef CHECK_OFFSET
@@ -273,7 +273,7 @@ jobject
 ArtRuntime::InvokeOriginalMethod(jlong slot, jobject this_object, jobjectArray args) {
     JNIEnv *env = GetJniEnv();
     auto *param = reinterpret_cast<ArtHookParam *>(slot);
-    if (slot <= 0) {
+    if (slot == 0) {
         env->ThrowNew(
                 WellKnownClasses::java_lang_IllegalArgumentException,
                 "Failed to resolve slot."
@@ -437,6 +437,8 @@ ALWAYS_INLINE bool ArtRuntime::EnforceDisableHiddenAPIPolicyImpl() {
     }
     void *symbol = nullptr;
 
+    void* art_elf_image_ = WDynamicLibOpen(kLibArtPath);
+
     // Android P : Preview 1 ~ 4 version
     symbol = WDynamicLibSymbol(
             art_elf_image_,
@@ -469,21 +471,7 @@ ALWAYS_INLINE bool ArtRuntime::EnforceDisableHiddenAPIPolicyImpl() {
     if (symbol) {
         WInlineHookFunction(symbol, reinterpret_cast<void *>(OnInvokeHiddenAPI), nullptr);
     }
-    // Android Q : Release version
-    symbol = WDynamicLibSymbol(
-            art_elf_image_,
-            "_ZN3art9hiddenapi6detail28ShouldDenyAccessToMemberImplINS_8ArtFieldEEEbPT_NS0_7ApiListENS0_12AccessMethodE"
-    );
-    if (symbol) {
-        WInlineHookFunction(symbol, reinterpret_cast<void *>(OnInvokeHiddenAPI), nullptr);
-    }
-    symbol = WDynamicLibSymbol(
-            art_elf_image_,
-            "_ZN3art9hiddenapi6detail28ShouldDenyAccessToMemberImplINS_9ArtMethodEEEbPT_NS0_7ApiListENS0_12AccessMethodE"
-    );
-    if (symbol) {
-        WInlineHookFunction(symbol, reinterpret_cast<void *>(OnInvokeHiddenAPI), nullptr);
-    }
+    WDynamicLibClose(art_elf_image_);
     return symbol != nullptr;
 }
 
@@ -498,37 +486,38 @@ ptr_t ArtRuntime::CloneArtObject(ptr_t art_object) {
     return symbols->Object_CloneWithSize(art_object, GetCurrentArtThread(), 0);
 }
 
-int (*old_ToDexPc)(void *thiz, void *a2, unsigned int a3, int a4);
-int new_ToDexPc(void *thiz, void *a2, unsigned int a3, int a4) {
-    return old_ToDexPc(thiz, a2, a3, 0);
-}
-
-bool is_hooked = false;
-void ArtRuntime::FixBugN() {
-    if (is_hooked)
-        return;
-    void *symbol = nullptr;
-    symbol = WDynamicLibSymbol(
-            art_elf_image_,
-            "_ZNK3art20OatQuickMethodHeader7ToDexPcEPNS_9ArtMethodEjb"
-    );
-    if (symbol) {
-        WInlineHookFunction(symbol, reinterpret_cast<void *>(new_ToDexPc), reinterpret_cast<void **>(&old_ToDexPc));
-    }
-    is_hooked = true;
-}
-
 jmethodID OnInvokeEncodeMethodId(void *thiz, void *method) {
     return reinterpret_cast<jmethodID>(method);
 }
 
-void ArtRuntime::hookEncodeArtMethod() {
+void ArtRuntime::hookEncodeArtMethod(void *art_elf_image_) {
     void *symbol = nullptr;
     symbol = WDynamicLibSymbol(art_elf_image_,
                                "_ZN3art3jni12JniIdManager14EncodeMethodIdEPNS_9ArtMethodE");
     if (symbol) {
         WInlineHookFunction(symbol, reinterpret_cast<void *>(OnInvokeEncodeMethodId),
                             nullptr);
+    }
+}
+
+bool ArtRuntime::isHookedMethod(void *art_method) {
+    auto entry = hooked_method_map_.find(reinterpret_cast<jmethodID>(art_method));
+    return entry != hooked_method_map_.end();
+}
+
+void* (*GetOatQuickMethodHeaderBackup)(void *thiz, uintptr_t pc);
+void* OnGetOatQuickMethodHeader(void *thiz, uintptr_t pc) {
+    if (ArtRuntime::Get()->isHookedMethod(thiz))
+        return nullptr;
+    return GetOatQuickMethodHeaderBackup(thiz, pc);
+}
+
+void ArtRuntime::hookGetOatQuickMethodHeader(void *art_elf_image_) {
+    void *symbol = WDynamicLibSymbol(art_elf_image_, "_ZN3art9ArtMethod23GetOatQuickMethodHeaderEm");
+    if (symbol == nullptr)
+        symbol = WDynamicLibSymbol(art_elf_image_, "_ZN3art9ArtMethod23GetOatQuickMethodHeaderEj");
+    if (symbol) {
+        WInlineHookFunction(symbol, reinterpret_cast<void *>(OnGetOatQuickMethodHeader), reinterpret_cast<void **>(&GetOatQuickMethodHeaderBackup));
     }
 }
 

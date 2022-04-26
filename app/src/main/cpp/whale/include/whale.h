@@ -17,6 +17,8 @@ void *WDynamicLibOpenAlias(const char *name, const char *path);
 
 void *WDynamicLibSymbol(void *handle, const char *name);
 
+void WDynamicLibClose(void *handle);
+
 #ifdef __cplusplus
 }
 #endif  // __cplusplus

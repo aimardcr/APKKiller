@@ -186,6 +186,7 @@ bool ElfReader::Open(const char *path) {
         LOG(ERROR) << "failed to open: " << path << ", err: " << strerror(errno);
         return false;
     }
+    fp_ = file;
     int fd = fileno(file);
     struct stat stat;
     if (fstat(fd, &stat) != 0) {

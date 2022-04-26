@@ -154,7 +154,7 @@ void FFIJniDispatcher(FFIClosure *closure, void *resp, void **args, void *userda
     ArtHookParam *param = reinterpret_cast<ArtHookParam *>(userdata);
     const char *argument = param->shorty_ + 1;
     unsigned int argument_len = (unsigned int) strlen(argument);
-    JNIEnv *env = *reinterpret_cast<JNIEnv **>(args[0]);
+    JNIEnv *env = ArtRuntime::Get()->GetJniEnv();
     jobject this_object = nullptr;
     if (!param->is_static_) {
         this_object = *reinterpret_cast<jobject *>(args[1]);

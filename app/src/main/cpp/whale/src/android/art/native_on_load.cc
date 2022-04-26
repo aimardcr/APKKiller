@@ -2,7 +2,7 @@
 #include "android/art/art_runtime.h"
 #include "base/logging.h"
 
-#define CLASS_NAME "com/lody/whale/WhaleRuntime"
+#define CLASS_NAME "com/kuro/whale/WhaleRuntime"
 
 #ifndef WHALE_ANDROID_AUTO_LOAD
 #define JNI_OnLoad Whale_OnLoad
@@ -73,7 +73,7 @@ static JNINativeMethod gMethods[] = {
         NATIVE_METHOD(WhaleRuntime, reserved1, "()V")
 };
 
-JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
+jint Whale_Init(JavaVM *vm, void *reserved) {
     JNIEnv *env = nullptr;
     if (vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_4) != JNI_OK) {
         return -1;

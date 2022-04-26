@@ -17,9 +17,6 @@ void WhaleRuntime_reserved1(JNIEnv *env, jclass cl);
 
 }
 
-#ifndef WHALE_ANDROID_AUTO_LOAD
-JNIEXPORT jint JNICALL Whale_OnLoad(JavaVM *vm, void *reserved);
-#endif
-
+jint Whale_Init(JavaVM *vm, void *reserved);
 
 #endif  // WHALE_ANDROID_ART_NATIVE_ON_LOAD_H_

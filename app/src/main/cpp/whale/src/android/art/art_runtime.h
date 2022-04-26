@@ -129,16 +129,17 @@ class ArtRuntime final {
 
     ptr_t CloneArtObject(ptr_t art_object);
 
-    void FixBugN();
+    void hookEncodeArtMethod(void *art_elf_image_);
 
-    void hookEncodeArtMethod();
+    bool isHookedMethod(void *art_method);
+
+    void hookGetOatQuickMethodHeader(void *art_elf_image_);
 
  private:
     JavaVM *vm_;
     jclass java_class_;
     jmethodID bridge_method_;
     s4 api_level_;
-    void *art_elf_image_;
     NativeBridgeCallbacks OPTION *android_bridge_callbacks_;
     ArtSymbolResolver art_symbol_resolver_;
     RuntimeObjects runtime_objects_;

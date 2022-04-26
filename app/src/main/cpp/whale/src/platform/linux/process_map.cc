@@ -1,6 +1,7 @@
 #include <string>
 #include <base/logging.h>
 #include <climits>
+#include <sys/mman.h>
 #include "platform/linux/process_map.h"
 #include "process_map.h"
 
@@ -51,7 +52,7 @@ std::unique_ptr<MemoryRange> FindExecuteMemoryRange(const char *name) {
 }
 
 void
-ForeachMemoryRange(std::function<bool(uintptr_t, uintptr_t, uintptr_t offset, char *, char *)> callback) {
+ForeachMemoryRange(std::function<bool(uintptr_t, uintptr_t, uintptr_t, char *, char *)> callback) {
     FILE *f;
     if ((f = fopen("/proc/self/maps", "r"))) {
         char buf[PATH_MAX], perm[12] = {'\0'}, dev[12] = {'\0'}, mapname[PATH_MAX] = {'\0'};

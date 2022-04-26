@@ -7,35 +7,6 @@ set(LIBRARY_NAME "whale")
 enable_language(ASM)
 SET(CMAKE_ASM_FLAGS "${CFLAGS}  -x assembler-with-cpp")
 
-if (CMAKE_SYSTEM_NAME MATCHES "^Android")
-    set(KERNEL "Linux")
-    set(PLATFORM "Android")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -s -Wl,--gc-sections")
-    add_definitions("-DWHALE_ANDROID_AUTO_LOAD")
-    message("Building Whale for Android(${CMAKE_SYSTEM_PROCESSOR})...")
-elseif (PLATFORM STREQUAL "IOS")
-    set(KERNEL "Darwin")
-    add_definitions("-DDARWIN")
-    include_directories(/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include)
-    if (IOS_ARCH STREQUAL "arm64")
-        set(CMAKE_SYSTEM_PROCESSOR "aarch64")
-    elseif (IOS_ARCH MATCHES "arm")
-        set(CMAKE_SYSTEM_PROCESSOR "arm")
-    endif ()
-    message("Building Whale for IOS(${CMAKE_SYSTEM_PROCESSOR})...")
-else ()
-    if (${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
-        set(KERNEL "Darwin")
-        add_definitions("-DDARWIN")
-    endif ()
-    message("Building Whale for ${CMAKE_SYSTEM_NAME}(${CMAKE_SYSTEM_PROCESSOR})...")
-endif ()
-
-
-include_directories(src/libffi src/libffi/platform_include)
-
 set(WHALE_SOURCES
         src/whale.cc
         src/interceptor.cc
@@ -57,11 +28,6 @@ set(WHALE_SOURCES
 set(WHALE_LINUX_SOURCES
         src/platform/linux/elf_image.cc
         src/platform/linux/process_map.cc
-        )
-
-
-set(WHALE_DARWIN_SOURCES
-        src/dbi/darwin/macho_import_hook.cc
         )
 
 set(WHALE_ANDROID_ART
@@ -148,45 +114,21 @@ elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "^x86_64")
 
 endif ()
 
-
-if (PLATFORM STREQUAL "Android")
-
-    set(WHALE_SOURCES ${WHALE_SOURCES} ${WHALE_ANDROID_ART})
-
-    if (CMAKE_SYSTEM_PROCESSOR MATCHES "^arm")
-
-        set(WHALE_SOURCES ${WHALE_SOURCES} ${WHALE_ANDROID_ART_AARCH32})
-
-    elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64")
-
-        set(WHALE_SOURCES ${WHALE_SOURCES} ${WHALE_ANDROID_ART_AARCH64})
-
-    elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "^(i.86|x86?)$")
-
-        set(WHALE_SOURCES ${WHALE_SOURCES} ${WHALE_ANDROID_ART_X86})
-
-    elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "^x86_64")
-        set(WHALE_SOURCES ${WHALE_SOURCES} ${WHALE_ANDROID_ART_X86_64})
-
-    endif ()
-
-endif ()
-
-if (KERNEL STREQUAL "Linux")
-
-    set(WHALE_SOURCES ${WHALE_SOURCES} ${WHALE_LINUX_SOURCES})
-
-elseif (KERNEL STREQUAL "Darwin")
-    set(WHALE_SOURCES ${WHALE_SOURCES} ${WHALE_DARWIN_SOURCES})
-endif ()
+set(WHALE_SOURCES ${WHALE_SOURCES} ${WHALE_ANDROID_ART})
+set(WHALE_SOURCES ${WHALE_SOURCES} ${WHALE_LINUX_SOURCES})
 
 if (CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm|aarch64)")
     include_directories(src/assembler/vixl)
 endif ()
 
 add_subdirectory(src/assembler/vixl)
+include_directories(src/libffi src/libffi/platform_include)
 include_directories(src)
 
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -s -Wl,--gc-sections")
+add_definitions("-DWHALE_ANDROID_AUTO_LOAD")
 add_definitions("-DWHALE_LIBRARY_NAME=\"lib${LIBRARY_NAME}.so\"")
 add_library(${LIBRARY_NAME} STATIC ${WHALE_SOURCES})
 
@@ -196,6 +138,4 @@ if (CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm|aarch64)")
     target_link_libraries(${LIBRARY_NAME} vixl)
 endif ()
 
-if (PLATFORM STREQUAL "Android")
-    target_link_libraries(${LIBRARY_NAME} log)
-endif ()
+target_link_libraries(${LIBRARY_NAME} log)
