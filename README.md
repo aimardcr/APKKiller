@@ -1,10 +1,14 @@
 # APKKiller
-APKKiller is a method to bypass android application integrity and signature check.
+APKKiller is a method to bypass android application integrity and signature check. APKKiller uses JNI Reflection and using some trick and hack to bypass hidden API restrictions.
+
 ## How does it work?
 When an android application is loaded, it stores various information regarding current running Application like App Name, Package Name, Signature, APK Path, etc.
-You can't access those information using normal code, but with _Reflection_ you access, read and write new data to those internal classes & fields. These informations are stored in a class like [AppBindData](https://android.googlesource.com/platform/frameworks/base/+/master/core/java/android/app/ActivityThread.java#855), [LoadedApk](https://android.googlesource.com/platform/frameworks/base/+/master/core/java/android/app/LoadedApk.java), [ApplicationInfo](https://android.googlesource.com/platform/frameworks/base/+/master/core/java/android/content/pm/ApplicationInfo.java), etc.
+You can't access those information normal way, but with _Reflection_ you access, read and write new data to those internal classes & fields. 
 
-APKKiller uses the advantage of _Reflection_ to access hidden information of the android app such as _Application Signature_ or _Application APK Path_ and replace it with a new data so that the application thinks its _Signature_ is still the original one even when the APK file is already being tampered and resigned using a new signature.
+These informations are stored in a class like [AppBindData](https://android.googlesource.com/platform/frameworks/base/+/master/core/java/android/app/ActivityThread.java#855), [LoadedApk](https://android.googlesource.com/platform/frameworks/base/+/master/core/java/android/app/LoadedApk.java), [ApplicationInfo](https://android.googlesource.com/platform/frameworks/base/+/master/core/java/android/content/pm/ApplicationInfo.java), etc.
+
+APKKiller changes data on those classes to spoof current application information such APK Path, APK Signatures, APK Installer Information, etc. APKKiller is not guaranteed to work on all apps/games, but it is guaranteed to bypass majorities of application security system.
+
 ## How to use it?
 1. Get the target app original _Signature_ using [APKSignReader](https://github.com/aimardcr/APKSignReader)
 2. Change **apk_signatures** in `APKKiller.h` using the resuslt of _APKSignReader_
