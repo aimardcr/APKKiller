@@ -1,7 +1,7 @@
-/.grandle
-/.idea
-/build
-/grandle
+.grandle
+.idea
+build
+grandle
 build.gradle
 gradle.properties
 gradlew
