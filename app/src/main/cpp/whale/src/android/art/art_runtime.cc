@@ -186,7 +186,7 @@ bool ArtRuntime::OnLoad(JavaVM *vm, JNIEnv *env, jclass java_class) {
 
     hookGetOatQuickMethodHeader(art_elf_image_);
 
-    WDynamicLibClose(art_elf_image_);
+    // WDynamicLibClose(art_elf_image_);
     pthread_mutex_init(&mutex, nullptr);
 //    EnforceDisableHiddenAPIPolicy();
     return true;
@@ -471,7 +471,7 @@ ALWAYS_INLINE bool ArtRuntime::EnforceDisableHiddenAPIPolicyImpl() {
     if (symbol) {
         WInlineHookFunction(symbol, reinterpret_cast<void *>(OnInvokeHiddenAPI), nullptr);
     }
-    WDynamicLibClose(art_elf_image_);
+    // WDynamicLibClose(art_elf_image_);
     return symbol != nullptr;
 }
 

@@ -1,9 +1,11 @@
-package com.kuro;
+package com.kuro.app;
 
 import android.app.Activity;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
+
+import com.kuro.R;
 
 public class MainActivity extends Activity {
     @Override

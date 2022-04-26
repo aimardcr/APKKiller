@@ -12,6 +12,10 @@ public class APKKiller {
         System.loadLibrary("kuro");
     }
 
+    public static void Kill() {
+
+    }
+
     public static native void Start(Context context);
     public static native Object processInvoke(Method method, Object[] args);
 
