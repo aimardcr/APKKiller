@@ -461,11 +461,15 @@ void APKKill(JNIEnv *env, jclass clazz, jobject context) {
         {
             auto signs = base64_decode(m_APKSign);
             BinaryReader reader(signs.data(), signs.size());
-            apk_signatures.resize((int) reader.readByte());
+            apk_signatures.resize((int) reader.readInt8());
             for (int i = 0; i < apk_signatures.size(); i++) {
-                apk_signatures[i].resize(reader.readInt());
-                auto sign = reader.readBytes(apk_signatures[i].size());
-                memcpy(apk_signatures[i].data(), sign.data(), sign.size());
+                size_t size = reader.readInt32(), n;
+                apk_signatures[i].resize(size);
+
+                uint8_t *sign = new uint8_t[size];
+                if ((n = reader.read(sign, size)) > 0) {
+                    memcpy(apk_signatures[i].data(), sign, n);
+                }
             }
         }
     }
@@ -633,7 +637,6 @@ jobject processInvoke(JNIEnv *env, jobject clazz, jobject method, jobjectArray a
                 const char *installingPackageName = env->GetStringUTFChars((jstring) mInstallingPackageName, NULL);
 
                 // TODO: Write new information then return it
-
             }
         }
     }

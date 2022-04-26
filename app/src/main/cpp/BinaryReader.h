@@ -12,15 +12,18 @@ private:
 public:
     BinaryReader(uint8_t *data, size_t size);
     ~BinaryReader();
-    uint8_t readByte();
-    int16_t readShort();
-    uint16_t readUShort();
-    int32_t readInt();
-    uint32_t readUInt();
-    int64_t readLong();
-    uint64_t readULong();
+    int8_t readInt8();
+    uint8_t readUInt8();
+    int16_t readInt16();
+    uint16_t readUInt16();
+    int32_t readInt32();
+    uint32_t readUInt32();
+    int64_t readInt64();
+    uint64_t readUInt64();
     std::string readString();
-    std::vector<uint8_t> readBytes(size_t n);
+    size_t read(uint8_t *buffer, size_t length);
+private:
+    bool checkSize(size_t size);
 };
 
 #endif //APKKILLER_BINARYREADER_H

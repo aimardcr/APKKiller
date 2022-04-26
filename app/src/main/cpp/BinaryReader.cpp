@@ -13,77 +13,75 @@ BinaryReader::~BinaryReader() {
     this->pos = 0;
 }
 
-uint8_t BinaryReader::readByte() {
-    if (this->pos >= this->size) {
+bool BinaryReader::checkSize(size_t size) {
+    if (this->pos + size > this->size) {
+        return false;
+    }
+    return true;
+}
+
+int8_t BinaryReader::readInt8() {
+    if (!this->checkSize(sizeof(int8_t))) {
         return 0;
     }
     return this->data[this->pos++];
 }
 
-int16_t BinaryReader::readShort() {
-    int16_t value = 0;
-    value |= this->readByte();
-    value |= this->readByte() << 8;
-    return value;
+uint8_t BinaryReader::readUInt8() {
+    if (!this->checkSize(sizeof(uint8_t))) {
+        return 0;
+    }
+    return (uint8_t) (this->readInt8() & 0xFF);
 }
 
-uint16_t BinaryReader::readUShort() {
-    uint16_t value = 0;
-    value |= this->readByte();
-    value |= this->readByte() << 8;
-    return value;
+int16_t BinaryReader::readInt16() {
+    if (!this->checkSize(sizeof(int16_t))) {
+        return 0;
+    }
+    return (int16_t) (this->readInt8() | this->readInt8() << 8);
 }
 
-int32_t BinaryReader::readInt() {
-    int32_t value = 0;
-    value |= this->readByte();
-    value |= this->readByte() << 8;
-    value |= this->readByte() << 16;
-    value |= this->readByte() << 24;
-    return value;
+uint16_t BinaryReader::readUInt16() {
+    if (!this->checkSize(sizeof(uint16_t))) {
+        return 0;
+    }
+    return (uint16_t) readInt16();
 }
 
-uint32_t BinaryReader::readUInt() {
-    uint32_t value = 0;
-    value |= this->readByte();
-    value |= this->readByte() << 8;
-    value |= this->readByte() << 16;
-    value |= this->readByte() << 24;
-    return value;
+int32_t BinaryReader::readInt32() {
+    if (!this->checkSize(sizeof(int32_t))) {
+        return 0;
+    }
+    return (int32_t) (this->readInt8() | this->readInt8() << 8 | this->readInt8() << 16 | this->readInt8() << 24);
 }
 
-int64_t BinaryReader::readLong() {
-    int64_t value = 0;
-    value |= this->readByte();
-    value |= this->readByte() << 8;
-    value |= this->readByte() << 16;
-    value |= this->readByte() << 24;
-    value |= this->readByte() << 32;
-    value |= this->readByte() << 40;
-    value |= this->readByte() << 48;
-    value |= this->readByte() << 56;
-    return value;
+uint32_t BinaryReader::readUInt32() {
+    if (!this->checkSize(sizeof(uint32_t))) {
+        return 0;
+    }
+    return (uint32_t) readInt32();
 }
 
-uint64_t BinaryReader::readULong() {
-    uint64_t value = 0;
-    value |= this->readByte();
-    value |= this->readByte() << 8;
-    value |= this->readByte() << 16;
-    value |= this->readByte() << 24;
-    value |= this->readByte() << 32;
-    value |= this->readByte() << 40;
-    value |= this->readByte() << 48;
-    value |= this->readByte() << 56;
-    return value;
+int64_t BinaryReader::readInt64() {
+    if (!this->checkSize(sizeof(int64_t))) {
+        return 0;
+    }
+    return (int64_t) (this->readInt8() | this->readInt8() << 8 | this->readInt8() << 16 | this->readInt8() << 24 | this->readInt8() << 32 | this->readInt8() << 40 | this->readInt8() << 48 | this->readInt8() << 56);
+}
+
+uint64_t BinaryReader::readUInt64() {
+    if (!this->checkSize(sizeof(uint64_t))) {
+        return 0;
+    }
+    return (uint64_t) readInt64();
 }
 
 std::string BinaryReader::readString() {
-    if (this->pos + 2 >= this->size) {
+    if (!this->checkSize(sizeof(uint16_t))) {
         return "";
     }
-    uint16_t length = this->readUShort();
-    if (this->pos + length >= this->size) {
+    uint16_t length = this->readUInt16();
+    if (!this->checkSize(length)) {
         return "";
     }
     std::string value;
@@ -93,10 +91,11 @@ std::string BinaryReader::readString() {
     return value;
 }
 
-std::vector<uint8_t> BinaryReader::readBytes(size_t n) {
-    std::vector<uint8_t> value;
-    value.resize(n);
-    memcpy(&value[0], &this->data[this->pos], n);
-    this->pos += n;
-    return value;
+size_t BinaryReader::read(uint8_t *buffer, size_t length) {
+    if (!this->checkSize(length)) {
+        return 0;
+    }
+    memcpy(buffer, &this->data[this->pos], length);
+    this->pos += length;
+    return length;
 }
