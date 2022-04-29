@@ -1,7 +1,3 @@
-//
-// Created by ASUS on 4/15/2022.
-//
-
 #include <iostream>
 #include <vector>
 

@@ -1,7 +1,3 @@
-//
-// Created by ASUS on 4/15/2022.
-//
-
 #include "Utils.h"
 
 std::vector<uint8_t> base64_decode(const std::string &in) {
