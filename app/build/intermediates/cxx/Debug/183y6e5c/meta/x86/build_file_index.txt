@@ -1,0 +1,3 @@
+C:\Users\ASUS\AndroidStudioProjects\APKKiller\app\src\main\cpp\CMakeLists.txt
+C:\Users\ASUS\AndroidStudioProjects\APKKiller\app\src\main\cpp\whale\CMakeLists.txt
+C:\Users\ASUS\AndroidStudioProjects\APKKiller\app\src\main\cpp\whale\src\assembler\vixl\CMakeLists.txt

@@ -1,0 +1,47 @@
+{
+  "buildFiles": [
+    "C:\\Users\\ASUS\\AndroidStudioProjects\\APKKiller\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "C:\\Users\\ASUS\\AndroidStudioProjects\\APKKiller\\app\\src\\main\\cpp\\whale\\CMakeLists.txt",
+    "C:\\Users\\ASUS\\AndroidStudioProjects\\APKKiller\\app\\src\\main\\cpp\\whale\\src\\assembler\\vixl\\CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "C:\\Users\\ASUS\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe",
+      "-C",
+      "C:\\Users\\ASUS\\AndroidStudioProjects\\APKKiller\\app\\.cxx\\Debug\\183y6e5c\\x86",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "C:\\Users\\ASUS\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe",
+    "-C",
+    "C:\\Users\\ASUS\\AndroidStudioProjects\\APKKiller\\app\\.cxx\\Debug\\183y6e5c\\x86",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "kuro-Debug-x86": {
+      "artifactName": "kuro",
+      "buildCommandComponents": [
+        "C:\\Users\\ASUS\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe",
+        "-C",
+        "C:\\Users\\ASUS\\AndroidStudioProjects\\APKKiller\\app\\.cxx\\Debug\\183y6e5c\\x86",
+        "kuro"
+      ],
+      "abi": "x86",
+      "output": "C:\\Users\\ASUS\\AndroidStudioProjects\\APKKiller\\app\\build\\intermediates\\cxx\\Debug\\183y6e5c\\obj\\x86\\libkuro.so",
+      "runtimeFiles": []
+    },
+    "whale-Debug-x86": {
+      "artifactName": "whale",
+      "buildCommandComponents": [
+        "C:\\Users\\ASUS\\AppData\\Local\\Android\\Sdk\\cmake\\3.10.2.4988404\\bin\\ninja.exe",
+        "-C",
+        "C:\\Users\\ASUS\\AndroidStudioProjects\\APKKiller\\app\\.cxx\\Debug\\183y6e5c\\x86",
+        "whale"
+      ],
+      "abi": "x86",
+      "output": "C:\\Users\\ASUS\\AndroidStudioProjects\\APKKiller\\app\\.cxx\\Debug\\183y6e5c\\x86\\whale\\libwhale.a",
+      "runtimeFiles": []
+    }
+  }
+}

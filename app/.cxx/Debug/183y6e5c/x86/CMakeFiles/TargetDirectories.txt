@@ -1,0 +1,8 @@
+C:/Users/ASUS/AndroidStudioProjects/APKKiller/app/.cxx/Debug/183y6e5c/x86/CMakeFiles/kuro.dir
+C:/Users/ASUS/AndroidStudioProjects/APKKiller/app/.cxx/Debug/183y6e5c/x86/CMakeFiles/edit_cache.dir
+C:/Users/ASUS/AndroidStudioProjects/APKKiller/app/.cxx/Debug/183y6e5c/x86/CMakeFiles/rebuild_cache.dir
+C:/Users/ASUS/AndroidStudioProjects/APKKiller/app/.cxx/Debug/183y6e5c/x86/whale/CMakeFiles/whale.dir
+C:/Users/ASUS/AndroidStudioProjects/APKKiller/app/.cxx/Debug/183y6e5c/x86/whale/CMakeFiles/edit_cache.dir
+C:/Users/ASUS/AndroidStudioProjects/APKKiller/app/.cxx/Debug/183y6e5c/x86/whale/CMakeFiles/rebuild_cache.dir
+C:/Users/ASUS/AndroidStudioProjects/APKKiller/app/.cxx/Debug/183y6e5c/x86/whale/src/assembler/vixl/CMakeFiles/edit_cache.dir
+C:/Users/ASUS/AndroidStudioProjects/APKKiller/app/.cxx/Debug/183y6e5c/x86/whale/src/assembler/vixl/CMakeFiles/rebuild_cache.dir
