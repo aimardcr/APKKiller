@@ -4,8 +4,227 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c8a5dc1f-90f9-4fed-b2da-a72e5350b5c1" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="c8a5dc1f-90f9-4fed-b2da-a72e5350b5c1" name="Default Changelist" comment="Major changes.">
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/include/whale.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/include/whale.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/android_build.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/android_build.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/art/art_hook_param.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/art/art_hook_param.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/art/art_jni_trampoline.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/art/art_jni_trampoline.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/art/art_jni_trampoline.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/art/art_jni_trampoline.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/art/art_method.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/art/art_method.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/art/art_method.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/art/art_method.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/art/art_runtime.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/art/art_runtime.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/art/art_runtime.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/art/art_runtime.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/art/art_symbol_resolver.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/art/art_symbol_resolver.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/art/art_symbol_resolver.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/art/art_symbol_resolver.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/art/java_types.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/art/java_types.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/art/java_types.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/art/java_types.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/art/modifiers.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/art/modifiers.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/art/native_on_load.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/art/native_on_load.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/art/native_on_load.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/art/native_on_load.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/art/scoped_thread_state_change.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/art/scoped_thread_state_change.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/art/scoped_thread_state_change.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/art/scoped_thread_state_change.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/art/well_known_classes.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/art/well_known_classes.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/art/well_known_classes.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/art/well_known_classes.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/jni_helper.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/jni_helper.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/native_bridge.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/android/native_bridge.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/assembler.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/assembler.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/assembler.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/assembler.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/label.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/label.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/managed_register.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/managed_register.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/memory_region.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/memory_region.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/memory_region.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/memory_region.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/value_object.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/value_object.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch32/assembler-aarch32.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch32/assembler-aarch32.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch32/assembler-aarch32.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch32/assembler-aarch32.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch32/constants-aarch32.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch32/constants-aarch32.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch32/constants-aarch32.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch32/constants-aarch32.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch32/disasm-aarch32.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch32/disasm-aarch32.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch32/disasm-aarch32.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch32/disasm-aarch32.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch32/instructions-aarch32.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch32/instructions-aarch32.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch32/instructions-aarch32.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch32/instructions-aarch32.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch32/location-aarch32.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch32/location-aarch32.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch32/location-aarch32.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch32/location-aarch32.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch32/macro-assembler-aarch32.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch32/macro-assembler-aarch32.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch32/macro-assembler-aarch32.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch32/macro-assembler-aarch32.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch32/operands-aarch32.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch32/operands-aarch32.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch32/operands-aarch32.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch32/operands-aarch32.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/abi-aarch64.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/abi-aarch64.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/assembler-aarch64.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/assembler-aarch64.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/assembler-aarch64.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/assembler-aarch64.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/constants-aarch64.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/constants-aarch64.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/cpu-aarch64.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/cpu-aarch64.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/cpu-aarch64.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/cpu-aarch64.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/cpu-features-auditor-aarch64.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/cpu-features-auditor-aarch64.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/cpu-features-auditor-aarch64.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/cpu-features-auditor-aarch64.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/decoder-aarch64.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/decoder-aarch64.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/decoder-aarch64.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/decoder-aarch64.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/disasm-aarch64.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/disasm-aarch64.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/disasm-aarch64.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/disasm-aarch64.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/instructions-aarch64.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/instructions-aarch64.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/instructions-aarch64.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/instructions-aarch64.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/instrument-aarch64.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/instrument-aarch64.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/instrument-aarch64.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/instrument-aarch64.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/logic-aarch64.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/logic-aarch64.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/macro-assembler-aarch64.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/macro-assembler-aarch64.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/macro-assembler-aarch64.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/macro-assembler-aarch64.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/operands-aarch64.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/operands-aarch64.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/operands-aarch64.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/operands-aarch64.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/pointer-auth-aarch64.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/pointer-auth-aarch64.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/simulator-aarch64.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/simulator-aarch64.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/simulator-aarch64.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/simulator-aarch64.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/simulator-constants-aarch64.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/aarch64/simulator-constants-aarch64.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/assembler-base-vixl.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/assembler-base-vixl.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/code-buffer-vixl.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/code-buffer-vixl.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/code-buffer-vixl.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/code-buffer-vixl.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/code-generation-scopes-vixl.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/code-generation-scopes-vixl.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/compiler-intrinsics-vixl.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/compiler-intrinsics-vixl.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/compiler-intrinsics-vixl.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/compiler-intrinsics-vixl.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/cpu-features.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/cpu-features.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/cpu-features.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/cpu-features.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/globals-vixl.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/globals-vixl.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/invalset-vixl.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/invalset-vixl.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/macro-assembler-interface.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/macro-assembler-interface.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/platform-vixl.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/platform-vixl.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/pool-manager-impl.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/pool-manager-impl.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/pool-manager.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/pool-manager.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/utils-vixl.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/utils-vixl.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/utils-vixl.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/vixl/utils-vixl.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/x86/assembler_x86.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/x86/assembler_x86.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/x86/assembler_x86.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/x86/assembler_x86.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/x86/constants_x86.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/x86/constants_x86.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/x86/managed_register_x86.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/x86/managed_register_x86.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/x86/managed_register_x86.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/x86/managed_register_x86.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/x86/registers_x86.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/x86/registers_x86.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/x86_64/assembler_x86_64.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/x86_64/assembler_x86_64.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/x86_64/assembler_x86_64.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/x86_64/assembler_x86_64.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/x86_64/constants_x86_64.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/x86_64/constants_x86_64.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/x86_64/managed_register_x86_64.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/x86_64/managed_register_x86_64.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/x86_64/managed_register_x86_64.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/x86_64/managed_register_x86_64.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/x86_64/registers_x86_64.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/assembler/x86_64/registers_x86_64.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/base/align.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/base/align.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/base/array_ref.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/base/array_ref.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/base/bit_utils.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/base/bit_utils.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/base/cxx_helper.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/base/cxx_helper.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/base/enums.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/base/enums.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/base/logging.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/base/logging.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/base/macros.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/base/macros.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/base/offsets.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/base/offsets.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/base/primitive_types.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/base/primitive_types.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/base/singleton.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/base/singleton.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/base/stringprintf.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/base/stringprintf.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/arm/decoder_arm.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/arm/decoder_arm.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/arm/decoder_arm.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/arm/decoder_arm.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/arm/decoder_thumb.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/arm/decoder_thumb.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/arm/decoder_thumb.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/arm/decoder_thumb.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/arm/inline_hook_arm.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/arm/inline_hook_arm.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/arm/inline_hook_arm.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/arm/inline_hook_arm.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/arm/instruction_rewriter_arm.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/arm/instruction_rewriter_arm.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/arm/instruction_rewriter_arm.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/arm/instruction_rewriter_arm.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/arm/registers_arm.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/arm/registers_arm.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/arm64/decoder_arm64.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/arm64/decoder_arm64.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/arm64/decoder_arm64.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/arm64/decoder_arm64.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/arm64/inline_hook_arm64.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/arm64/inline_hook_arm64.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/arm64/inline_hook_arm64.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/arm64/inline_hook_arm64.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/arm64/instruction_rewriter_arm64.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/arm64/instruction_rewriter_arm64.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/arm64/instruction_rewriter_arm64.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/arm64/instruction_rewriter_arm64.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/arm64/registers_arm64.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/arm64/registers_arm64.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/backup_code.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/backup_code.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/darwin/macho_import_hook.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/darwin/macho_import_hook.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/darwin/macho_import_hook.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/darwin/macho_import_hook.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/hook_common.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/hook_common.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/hook_common.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/hook_common.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/instruction_rewriter.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/instruction_rewriter.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/instruction_set.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/instruction_set.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/instruction_set.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/instruction_set.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/config.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/config.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/decoder.c" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/decoder.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/decoder.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/decoder.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/distorm.c" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/distorm.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/distorm.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/distorm.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/instructions.c" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/instructions.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/instructions.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/instructions.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/insts.c" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/insts.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/insts.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/insts.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/mnemonics.c" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/mnemonics.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/mnemonics.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/mnemonics.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/operands.c" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/operands.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/operands.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/operands.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/prefix.c" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/prefix.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/prefix.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/prefix.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/textdefs.c" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/textdefs.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/textdefs.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/textdefs.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/wstring.c" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/wstring.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/wstring.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/wstring.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/x86defs.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/distorm/x86defs.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/inline_hook_x86.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/inline_hook_x86.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/inline_hook_x86.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/inline_hook_x86.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/instruction_rewriter_x86.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/instruction_rewriter_x86.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/instruction_rewriter_x86.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/instruction_rewriter_x86.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/intercept_syscall_x86.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/intercept_syscall_x86.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/intercept_syscall_x86.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86/intercept_syscall_x86.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86_64/inline_hook_x86_64.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86_64/inline_hook_x86_64.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86_64/inline_hook_x86_64.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86_64/inline_hook_x86_64.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86_64/instruction_rewriter_x86_64.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86_64/instruction_rewriter_x86_64.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86_64/instruction_rewriter_x86_64.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/dbi/x86_64/instruction_rewriter_x86_64.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/interceptor.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/interceptor.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/interceptor.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/interceptor.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/aarch64/ffi_arm64.c" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/aarch64/ffi_arm64.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/aarch64/internal.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/aarch64/internal.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/aarch64/sysv_arm64.S" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/aarch64/sysv_arm64.S" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/arm/ffi_armv7.c" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/arm/ffi_armv7.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/arm/internal.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/arm/internal.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/arm/sysv_armv7.S" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/arm/sysv_armv7.S" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/closures.c" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/closures.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/debug.c" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/debug.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/dlmalloc.c" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/dlmalloc.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/ffi.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/ffi.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/ffi_cfi.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/ffi_cfi.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/ffi_common.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/ffi_common.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/ffi_cxx.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/ffi_cxx.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/ffi_cxx.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/ffi_cxx.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/fficonfig.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/fficonfig.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/ffitarget.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/ffitarget.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/java_raw_api.c" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/java_raw_api.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/platform_include/ffi_arm64.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/platform_include/ffi_arm64.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/platform_include/ffi_armv7.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/platform_include/ffi_armv7.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/platform_include/ffi_i386.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/platform_include/ffi_i386.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/platform_include/ffi_x86_64.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/platform_include/ffi_x86_64.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/platform_include/fficonfig_arm64.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/platform_include/fficonfig_arm64.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/platform_include/fficonfig_armv7.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/platform_include/fficonfig_armv7.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/platform_include/fficonfig_i386.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/platform_include/fficonfig_i386.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/platform_include/fficonfig_x86_64.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/platform_include/fficonfig_x86_64.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/platform_include/ffitarget_arm64.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/platform_include/ffitarget_arm64.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/platform_include/ffitarget_armv7.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/platform_include/ffitarget_armv7.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/platform_include/ffitarget_i386.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/platform_include/ffitarget_i386.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/platform_include/ffitarget_x86_64.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/platform_include/ffitarget_x86_64.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/prep_cif.c" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/prep_cif.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/raw_api.c" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/raw_api.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/types.c" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/types.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/x86/asmnames.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/x86/asmnames.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/x86/ffi64_x86_64.c" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/x86/ffi64_x86_64.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/x86/ffi_i386.c" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/x86/ffi_i386.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/x86/ffiw64_x86_64.c" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/x86/ffiw64_x86_64.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/x86/internal.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/x86/internal.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/x86/internal64.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/x86/internal64.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/x86/sysv_i386.S" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/x86/sysv_i386.S" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/x86/unix64_x86_64.S" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/x86/unix64_x86_64.S" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/x86/win64_x86_64.S" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/libffi/x86/win64_x86_64.S" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/platform/linux/elf_image.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/platform/linux/elf_image.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/platform/linux/elf_image.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/platform/linux/elf_image.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/platform/linux/process_map.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/platform/linux/process_map.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/platform/linux/process_map.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/platform/linux/process_map.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/platform/memory.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/platform/memory.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/platform/memory.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/platform/memory.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/simulator/code_simulator.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/simulator/code_simulator.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/simulator/code_simulator.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/simulator/code_simulator.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/simulator/code_simulator_arm64.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/simulator/code_simulator_arm64.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/simulator/code_simulator_arm64.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/simulator/code_simulator_arm64.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/simulator/code_simulator_container.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/simulator/code_simulator_container.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/simulator/code_simulator_container.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/simulator/code_simulator_container.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/cpp/whale/src/whale.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/cpp/whale/src/whale.cc" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -103,6 +322,21 @@
       <option name="presentableId" value="Default" />
       <updated>1651242734078</updated>
     </task>
+    <task id="LOCAL-00001" summary="Major changes.">
+      <created>1651242893753</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1651242893754</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Major changes.">
+      <created>1651242935059</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1651242935059</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -115,5 +349,9 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Major changes." />
+    <option name="LAST_COMMIT_MESSAGE" value="Major changes." />
   </component>
 </project>
