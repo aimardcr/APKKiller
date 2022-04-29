@@ -1,1 +1,0 @@
-C:\Users\ASUS\AndroidStudioProjects\APKKiller\app\src\main\cpp\whale\src\libffi\x86\sysv_i386.S
