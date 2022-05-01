@@ -31,7 +31,7 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         return -1;
     }
 
-    if (Whale_Init(vm, reserved) != 0) {
+    if (Whale_Init(vm, reserved) == JNI_ERR) {
         return -1;
     }
 
