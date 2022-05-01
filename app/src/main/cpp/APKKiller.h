@@ -31,6 +31,7 @@ namespace APKKiller {
     jobject g_packageManager;
     jobject g_proxy;
     std::string g_apkPkg;
+    int APILevel;
 
     class Reference {
     public:
@@ -150,6 +151,14 @@ namespace APKKiller {
             g_env->DeleteLocalRef(clazz);
         }
 
+        void set(jobject obj, jobject value) {
+            if (isStatic) {
+                g_env->SetStaticObjectField(clazz, field, value);
+            } else {
+                g_env->SetObjectField(obj, field, value);
+            }
+        }
+
         jobject get(jobject obj) {
             if (isStatic) {
                 return g_env->GetStaticObjectField(clazz, field);
@@ -158,11 +167,11 @@ namespace APKKiller {
             }
         }
 
-        void set(jobject obj, jobject value) {
+        jint getInt(jobject obj) {
             if (isStatic) {
-                g_env->SetStaticObjectField(clazz, field, value);
+                return g_env->GetStaticIntField(clazz, field);
             } else {
-                g_env->SetObjectField(obj, field, value);
+                return g_env->GetIntField(obj, field);
             }
         }
     };
@@ -177,10 +186,6 @@ namespace APKKiller {
         }
         ~Method() {
             g_env->DeleteLocalRef(method);
-        }
-
-        void Cleanup() {
-            this->~Method();
         }
 
         const char *getName() {
@@ -212,10 +217,6 @@ namespace APKKiller {
 
         ~Class() {
             g_env->DeleteLocalRef(clazz);
-        }
-
-        void Cleanup() {
-            this->~Class();
         }
 
         jclass getClass() {
@@ -427,16 +428,38 @@ void patch_PackageManager(jobject obj) {
 
 void doBypass(JNIEnv *env) {
     ElfImg art("libart.so");
-    auto setHiddenApiExemptionsMethod = (void (*)(JNIEnv *, jobject, jobjectArray)) art.getSymbolAddress("_ZN3artL32VMRuntime_setHiddenApiExemptionsEP7_JNIEnvP7_jclassP13_jobjectArray");
-    if (setHiddenApiExemptionsMethod != nullptr) {
-        auto objectClass = env->FindClass("java/lang/Object");
-        auto objectArray = env->NewObjectArray(1, objectClass, NULL);
-        env->SetObjectArrayElement(objectArray, 0, env->NewStringUTF("L"));
 
-        auto VMRuntimeClass = env->FindClass("dalvik/system/VMRuntime");
-        auto getRuntimeMethod = env->GetStaticMethodID(VMRuntimeClass, "getRuntime", "()Ldalvik/system/VMRuntime;");
-        auto runtime = env->CallStaticObjectMethod(VMRuntimeClass, getRuntimeMethod);
-        // setHiddenApiExemptionsMethod(env, runtime, objectArray);
+    if (APILevel < 30) {
+        auto setHiddenApiExemptionsMethod = (void (*)(JNIEnv *, jobject, jobjectArray)) art.getSymbolAddress("_ZN3artL32VMRuntime_setHiddenApiExemptionsEP7_JNIEnvP7_jclassP13_jobjectArray");
+        if (setHiddenApiExemptionsMethod != nullptr) {
+            auto objectClass = env->FindClass("java/lang/Object");
+            auto objectArray = env->NewObjectArray(1, objectClass, NULL);
+            env->SetObjectArrayElement(objectArray, 0, env->NewStringUTF("L"));
+
+            auto VMRuntimeClass = env->FindClass("dalvik/system/VMRuntime");
+            auto getRuntimeMethod = env->GetStaticMethodID(VMRuntimeClass, "getRuntime", "()Ldalvik/system/VMRuntime;");
+            auto runtime = env->CallStaticObjectMethod(VMRuntimeClass, getRuntimeMethod);
+            setHiddenApiExemptionsMethod(env, runtime, static_cast<jobjectArray>(env->NewGlobalRef(objectArray)));
+        }
+    }
+
+    auto returnFalse = +[]() {
+        return false;
+    };
+
+    std::vector<std::string> symbols = {
+        // API Level 30
+        "_ZN3art9hiddenapi24ShouldDenyAccessToMemberINS_8ArtFieldEEEbPT_RKNSt3__18functionIFNS0_13AccessContextEvEEENS0_12AccessMethodE",
+        "_ZN3art9hiddenapi24ShouldDenyAccessToMemberINS_9ArtMethodEEEbPT_RKNSt3__18functionIFNS0_13AccessContextEvEEENS0_12AccessMethodE",
+        "_ZN3art9hiddenapi6detail28ShouldDenyAccessToMemberImplINS_8ArtFieldEEEbPT_NS0_7ApiListENS0_12AccessMethodE",
+        "_ZN3art9hiddenapi6detail28ShouldDenyAccessToMemberImplINS_9ArtMethodEEEbPT_NS0_7ApiListENS0_12AccessMethodE"
+    };
+
+    for (auto &symbol : symbols) {
+        auto address = (void *) art.getSymbolAddress(symbol);
+        if (address) {
+            WInlineHookFunction(address, (void *) returnFalse, 0);
+        }
     }
 }
 
@@ -445,6 +468,9 @@ void APKKill(JNIEnv *env, jclass clazz, jobject context) {
 
     APKKiller::g_env = env;
     g_assetManager = AAssetManager_fromJava(env, env->CallObjectMethod(context, env->GetMethodID(env->FindClass("android/content/Context"), "getAssets", "()Landroid/content/res/AssetManager;")));
+
+    auto versionClass = env->FindClass("android/os/Build$VERSION");
+    APKKiller::APILevel = env->GetStaticIntField(versionClass, env->GetStaticFieldID(versionClass, "SDK_INT", "I"));
 
     std::string apkPkg = getPackageName(context);
     APKKiller::g_apkPkg = apkPkg;
@@ -538,7 +564,6 @@ void APKKill(JNIEnv *env, jclass clazz, jobject context) {
 jobject processInvoke(JNIEnv *env, jclass clazz, jobject method, jobjectArray args) {
     g_env = env;
 
-
     auto String_fromParam = [env, args](int idx) -> const char * {
         auto param = env->GetObjectArrayElement(args, idx);
         if (!param) {
@@ -565,7 +590,7 @@ jobject processInvoke(JNIEnv *env, jclass clazz, jobject method, jobjectArray ar
     auto mMethod = new Method(method);
     const char *mName = mMethod->getName();
     auto mResult = mMethod->invoke(g_packageManager, args);
-    mMethod->Cleanup();
+    delete mMethod;
 
     if (!strcmp(mName, "getPackageInfo")) {
         const char *packageName = String_fromParam(0);
@@ -593,7 +618,7 @@ jobject processInvoke(JNIEnv *env, jclass clazz, jobject method, jobjectArray ar
                     }
                     signaturesField->set(packageInfo, signatureArray);
 
-                    packageInfoClass->Cleanup();
+                    delete packageInfoClass;
                     env->DeleteLocalRef(signatureClass);
                     env->DeleteLocalRef(signatureArray);
                 }
@@ -632,9 +657,9 @@ jobject processInvoke(JNIEnv *env, jclass clazz, jobject method, jobjectArray ar
                     pastSigningCertificatesField->set(mSigningDetails, env->NewGlobalRef(signatureArray));
 
                     env->DeleteLocalRef(signatureClass);
-                    packageInfoClass->Cleanup();
-                    signingInfoClass->Cleanup();
-                    signingDetailsClass->Cleanup();
+                    delete packageInfoClass;
+                    delete signingInfoClass;
+                    delete signingDetailsClass;
                 }
                 return packageInfo;
             } else {
@@ -646,7 +671,7 @@ jobject processInvoke(JNIEnv *env, jclass clazz, jobject method, jobjectArray ar
                     if (applicationInfo) {
                         patch_ApplicationInfo(applicationInfo);
                     }
-                    packageInfoClass->Cleanup();
+                    delete packageInfoClass;
                 }
                 return packageInfo;
             }
@@ -687,8 +712,9 @@ jobject processInvoke(JNIEnv *env, jclass clazz, jobject method, jobjectArray ar
                 const char *installingPackageName = env->GetStringUTFChars((jstring) mInstallingPackageName, NULL);
 
                 // TODO: Write new information then return it
-                installSourceInfoClass->Cleanup();
-                signingInfoClass->Cleanup();
+
+                delete installSourceInfoClass;
+                delete signingInfoClass;
             }
         }
     }
