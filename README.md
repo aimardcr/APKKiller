@@ -15,6 +15,7 @@ APKKiller changes data on those classes to spoof current application information
 3. Build the APKKiller Project to APK
 4. Decompile both APKKiller APK and Target APK
 5. Copy smali from `com/kuro` (APKKiller smali) to the Target App smali
+6. Copy libs from APKKiller APK to Target APK (Make sure only copy same ABIs as the Target App, for example if Target App has only armeabi-v7a, then you should only copy armeabi-v7a)
 6. Locate Target App entry point in the smali, you can do this by taking a look at `AndroidManifest.xml`
 7. Call `Start` function on the target app `attachBaseContext` (Application) or `onCreate` (Activity) [Preferrably attachBaseContext]
 
