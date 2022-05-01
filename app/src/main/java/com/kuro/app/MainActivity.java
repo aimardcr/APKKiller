@@ -1,7 +1,9 @@
 package com.kuro.app;
 
 import android.app.Activity;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 

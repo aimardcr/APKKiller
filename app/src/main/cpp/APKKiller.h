@@ -340,7 +340,8 @@ void patch_ContextImpl(jobject obj) {
     if (g_env->IsInstanceOf(obj, contextImplClass->getClass())) {
         LOGI("-------- Patching ContextImpl - %p", obj);
         auto mPackageInfoField = contextImplClass->getField("mPackageInfo", "Landroid/app/LoadedApk;");
-        patch_PackageInfo(mPackageInfoField->get(obj));
+        patch_LoadedApk(mPackageInfoField->get(obj));
+
         auto mPackageManagerField = contextImplClass->getField("mPackageManager", "Landroid/content/pm/PackageManager;");
         mPackageManagerField->set(obj, g_proxy);
     }
@@ -537,13 +538,6 @@ void APKKill(JNIEnv *env, jclass clazz, jobject context) {
 jobject processInvoke(JNIEnv *env, jclass clazz, jobject method, jobjectArray args) {
     g_env = env;
 
-    auto Integer_intValue = [env](jobject integer) {
-        auto integerClass = env->FindClass("java/lang/Integer");
-        auto intValueMethod = env->GetMethodID(integerClass, "intValue", "()I");
-        auto result = env->CallIntMethod(integer, intValueMethod);
-        env->DeleteLocalRef(integerClass);
-        return result;
-    };
 
     auto String_fromParam = [env, args](int idx) -> const char * {
         auto param = env->GetObjectArrayElement(args, idx);
@@ -555,13 +549,16 @@ jobject processInvoke(JNIEnv *env, jclass clazz, jobject method, jobjectArray ar
         return result;
     };
 
-    auto Integer_fromParam = [env, args, Integer_intValue](int idx) -> int {
+    auto Integer_fromParam = [env, args](int idx) -> int {
         auto param = env->GetObjectArrayElement(args, idx);
         if (!param) {
             return 0;
         }
-        auto result = Integer_intValue(param);
+        auto integerClass = env->FindClass("java/lang/Integer");
+        auto intValueMethod = env->GetMethodID(integerClass, "intValue", "()I");
+        auto result = env->CallIntMethod(param, intValueMethod);
         env->DeleteLocalRef(param);
+        env->DeleteLocalRef(integerClass);
         return result;
     };
 
@@ -597,6 +594,8 @@ jobject processInvoke(JNIEnv *env, jclass clazz, jobject method, jobjectArray ar
                     signaturesField->set(packageInfo, signatureArray);
 
                     packageInfoClass->Cleanup();
+                    env->DeleteLocalRef(signatureClass);
+                    env->DeleteLocalRef(signatureArray);
                 }
                 return packageInfo;
             } else if ((flags & 0x8000000) != 0) {
@@ -629,9 +628,10 @@ jobject processInvoke(JNIEnv *env, jclass clazz, jobject method, jobjectArray ar
                         env->SetObjectArrayElement(signatureArray, i, env->NewObject(signatureClass, signatureConstructor, signature));
                     }
 
-                    signaturesField->set(mSigningDetails, signatureArray);
-                    pastSigningCertificatesField->set(mSigningDetails, signatureArray);
+                    signaturesField->set(mSigningDetails, env->NewGlobalRef(signatureArray));
+                    pastSigningCertificatesField->set(mSigningDetails, env->NewGlobalRef(signatureArray));
 
+                    env->DeleteLocalRef(signatureClass);
                     packageInfoClass->Cleanup();
                     signingInfoClass->Cleanup();
                     signingDetailsClass->Cleanup();

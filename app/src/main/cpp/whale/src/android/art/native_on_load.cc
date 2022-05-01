@@ -73,7 +73,7 @@ static JNINativeMethod gMethods[] = {
         NATIVE_METHOD(WhaleRuntime, reserved1, "()V")
 };
 
-jint Whale_Init(JavaVM *vm, void *reserved) {
+jint Whale_OnLoad(JavaVM *vm, void *reserved) {
     JNIEnv *env = nullptr;
     if (vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_4) != JNI_OK) {
         return -1;
@@ -92,5 +92,5 @@ jint Whale_Init(JavaVM *vm, void *reserved) {
         LOG(ERROR) << "Runtime setup failed";
         return JNI_ERR;
     }
-    return JNI_VERSION_1_4;
+    return JNI_VERSION_1_6;
 }

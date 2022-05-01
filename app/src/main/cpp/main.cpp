@@ -3,7 +3,7 @@
 
 #include "APKKiller.h"
 
-extern jint Whale_Init(JavaVM *vm, void *reserved);
+extern jint Whale_OnLoad(JavaVM *vm, void *reserved);
 
 int RegisterFunctions(JNIEnv *env) {
     JNINativeMethod methods[] = {
@@ -31,9 +31,5 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         return -1;
     }
 
-    if (Whale_Init(vm, reserved) == JNI_ERR) {
-        return -1;
-    }
-
-    return JNI_VERSION_1_6;
+    return Whale_OnLoad(vm, reserved);
 }
