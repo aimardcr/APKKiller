@@ -415,13 +415,7 @@ void patch_PackageManager(jobject obj) {
     mPMField.set(pm, g_proxy);
 }
 
-void doBypass(JNIEnv *env) {
-    ElfImg art("libart.so");
-
-    auto bypassHiddenAPI = +[]() {
-        return 0;
-    };
-
+void BypassHiddenAPI(JNIEnv *env) {
     std::vector<std::string> symbols = {
         // Android 10 - 12
         "_ZN3art9hiddenapi24ShouldDenyAccessToMemberINS_8ArtFieldEEEbPT_RKNSt3__18functionIFNS0_13AccessContextEvEEENS0_12AccessMethodE",
@@ -434,10 +428,13 @@ void doBypass(JNIEnv *env) {
         "_ZN3artL26VMRuntime_hasUsedHiddenApiEP7_JNIEnvP8_jobject"
     };
 
+    ElfImg art("libart.so");
     for (auto &symbol : symbols) {
         auto address = (void *) art.getSymbolAddress(symbol);
         if (address) {
-            WInlineHookFunction(address, (void *) bypassHiddenAPI, 0);
+            WInlineHookFunction(address, (void *) (+[]() {
+                return 0;
+            }), 0);
         }
     }
 }
@@ -471,7 +468,7 @@ void APKKill(JNIEnv *env, jclass clazz, jobject context) {
 
     APKKiller::g_apkPath = (jstring) env->NewGlobalRef(g_env->NewStringUTF(apkPath.c_str()));
 
-    doBypass(env);
+    BypassHiddenAPI(env);
 
     auto apkKillerClass = g_env->FindClass("com/kuro/APKKiller");
     auto javaKillerMethod = g_env->GetStaticMethodID(apkKillerClass, "Kill", "()V");
