@@ -22,7 +22,7 @@
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, "APKKiller", __VA_ARGS__)
 
 #define apk_asset_path "original.apk" // assets/original.apk
-#define apk_fake_name "original.apk" // /data/data/<package_name/cache/original.apk
+#define apk_fake_name "original.apk" // /data/data/<package_name>/cache/original.apk
 std::vector<std::vector<uint8_t>> apk_signatures{{}}; // if you fill this, it will ignore the m_APKSign from APKKiller.java
 
 namespace APKKiller {
@@ -260,16 +260,6 @@ namespace APKKiller {
             LOGI("Method %s(%s): %p", methodName, methodSig, method);
             return method;
         }
-
-        jmethodID getStaticMethod(const char *methodName, const char *methodSig) {
-            auto method = g_env->GetStaticMethodID(clazz, methodName, methodSig);
-            if (g_env->ExceptionCheck()) {
-                g_env->ExceptionDescribe();
-                g_env->ExceptionClear();
-            }
-            LOGI("Method %s(%s): %p", methodName, methodSig, method);
-            return method;
-        }
     };
 }
 
@@ -294,12 +284,11 @@ std::string getPackageName(jobject obj) {
     return g_env->GetStringUTFChars(packageName, 0);
 }
 
-
 void patch_ApplicationInfo(jobject obj) {
     if (!obj) return;
     LOGI("-------- Patching ApplicationInfo - %p", obj);
     Class applicationInfoClass("android/content/pm/ApplicationInfo");
-    
+
     auto sourceDirField = applicationInfoClass.getField("sourceDir", "Ljava/lang/String;");
     auto publicSourceDirField = applicationInfoClass.getField("publicSourceDir", "Ljava/lang/String;");
 
@@ -311,13 +300,13 @@ void patch_LoadedApk(jobject obj) {
     if (!obj) return;
     LOGI("-------- Patching LoadedApk - %p", obj);
     Class loadedApkClass("android/app/LoadedApk");
-    
+
     auto mApplicationInfoField = loadedApkClass.getField("mApplicationInfo", "Landroid/content/pm/ApplicationInfo;");
     patch_ApplicationInfo(mApplicationInfoField.get(obj));
-    
+
     auto mAppDirField = loadedApkClass.getField("mAppDir", "Ljava/lang/String;");
     auto mResDirField = loadedApkClass.getField("mResDir", "Ljava/lang/String;");
-    
+
     mAppDirField.set(obj, g_apkPath);
     mResDirField.set(obj, g_apkPath);
 }
@@ -326,21 +315,12 @@ void patch_AppBindData(jobject obj) {
     if (!obj) return;
     LOGI("-------- Patching AppBindData - %p", obj);
     Class appBindDataClass("android/app/ActivityThread$AppBindData");
-    
+
     auto infoField = appBindDataClass.getField("info", "Landroid/app/LoadedApk;");
     patch_LoadedApk(infoField.get(obj));
-    
+
     auto appInfoField = appBindDataClass.getField("appInfo", "Landroid/content/pm/ApplicationInfo;");
     patch_ApplicationInfo(appInfoField.get(obj));
-}
-
-void patch_PackageInfo(jobject obj) {
-    if (!obj) return;
-    LOGI("-------- Patching PackageInfo - %p", obj);
-    Class packageInfoClass("android/content/pm/PackageInfo");
-
-    auto applicationInfoField = packageInfoClass.getField("applicationInfo", "Landroid/content/pm/ApplicationInfo;");
-    patch_ApplicationInfo(applicationInfoField.get(obj));
 }
 
 void patch_ContextImpl(jobject obj) {
@@ -402,14 +382,14 @@ void extractAsset(std::string assetName, std::string extractPath) {
 
 void patch_PackageManager(jobject obj) {
     if (!obj) return;
-    
+
     Class activityThreadClass("android/app/ActivityThread");
     auto sCurrentActivityThreadField = activityThreadClass.getStaticField("sCurrentActivityThread", "Landroid/app/ActivityThread;");
     auto sCurrentActivityThread = sCurrentActivityThreadField.get(NULL);
 
     auto sPackageManagerField = activityThreadClass.getStaticField("sPackageManager", "Landroid/content/pm/IPackageManager;");
     g_packageManager = g_env->NewGlobalRef(sPackageManagerField.get(NULL));
-    
+
     Class iPackageManagerClass("android/content/pm/IPackageManager");
 
     auto classClass = g_env->FindClass("java/lang/Class");
@@ -438,36 +418,26 @@ void patch_PackageManager(jobject obj) {
 void doBypass(JNIEnv *env) {
     ElfImg art("libart.so");
 
-    if (APILevel < 30) {
-        auto setHiddenApiExemptionsMethod = (void (*)(JNIEnv *, jobject, jobjectArray)) art.getSymbolAddress("_ZN3artL32VMRuntime_setHiddenApiExemptionsEP7_JNIEnvP7_jclassP13_jobjectArray");
-        if (setHiddenApiExemptionsMethod != nullptr) {
-            auto objectClass = env->FindClass("java/lang/Object");
-            auto objectArray = env->NewObjectArray(1, objectClass, NULL);
-            env->SetObjectArrayElement(objectArray, 0, env->NewStringUTF("L"));
-
-            auto VMRuntimeClass = env->FindClass("dalvik/system/VMRuntime");
-            auto getRuntimeMethod = env->GetStaticMethodID(VMRuntimeClass, "getRuntime", "()Ldalvik/system/VMRuntime;");
-            auto runtime = env->CallStaticObjectMethod(VMRuntimeClass, getRuntimeMethod);
-            setHiddenApiExemptionsMethod(env, runtime, objectArray);
-        }
-    }
-
-    auto returnFalse = +[]() {
-        return false;
+    auto bypassHiddenAPI = +[]() {
+        return 0;
     };
 
     std::vector<std::string> symbols = {
-        // API Level 30
+        // Android 10 - 12
         "_ZN3art9hiddenapi24ShouldDenyAccessToMemberINS_8ArtFieldEEEbPT_RKNSt3__18functionIFNS0_13AccessContextEvEEENS0_12AccessMethodE",
         "_ZN3art9hiddenapi24ShouldDenyAccessToMemberINS_9ArtMethodEEEbPT_RKNSt3__18functionIFNS0_13AccessContextEvEEENS0_12AccessMethodE",
         "_ZN3art9hiddenapi6detail28ShouldDenyAccessToMemberImplINS_8ArtFieldEEEbPT_NS0_7ApiListENS0_12AccessMethodE",
-        "_ZN3art9hiddenapi6detail28ShouldDenyAccessToMemberImplINS_9ArtMethodEEEbPT_NS0_7ApiListENS0_12AccessMethodE"
+        "_ZN3art9hiddenapi6detail28ShouldDenyAccessToMemberImplINS_9ArtMethodEEEbPT_NS0_7ApiListENS0_12AccessMethodE",
+        // Android 9
+        "_ZN3art9ArtMethod23GetHiddenApiAccessFlagsEv",
+        "_ZN3art9hiddenapi6detail15MemberSignature10IsExemptedERKNSt3__16vectorINS3_12basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEENS8_ISA_EEEE",
+        "_ZN3artL26VMRuntime_hasUsedHiddenApiEP7_JNIEnvP8_jobject"
     };
 
     for (auto &symbol : symbols) {
         auto address = (void *) art.getSymbolAddress(symbol);
         if (address) {
-            WInlineHookFunction(address, (void *) returnFalse, 0);
+            WInlineHookFunction(address, (void *) bypassHiddenAPI, 0);
         }
     }
 }
@@ -513,19 +483,19 @@ void APKKill(JNIEnv *env, jclass clazz, jobject context) {
         {
             auto signs = base64_decode(m_APKSign);
             BinaryReader reader(signs.data(), signs.size());
-            apk_signatures.resize((int) reader.readInt8());
+            apk_signatures.resize(reader.readInt8());
             for (int i = 0; i < apk_signatures.size(); i++) {
                 size_t size = reader.readInt32(), n;
                 apk_signatures[i].resize(size);
 
-                uint8_t *sign = new uint8_t[size];
+                uint8_t sign[size];
                 if ((n = reader.read(sign, size)) > 0) {
                     memcpy(apk_signatures[i].data(), sign, n);
                 }
             }
         }
     }
-    
+
     Class activityThreadClass("android/app/ActivityThread");
     auto sCurrentActivityThreadField = activityThreadClass.getStaticField("sCurrentActivityThread", "Landroid/app/ActivityThread;");
     auto sCurrentActivityThread = sCurrentActivityThreadField.get(NULL);
@@ -642,11 +612,11 @@ jobject processInvoke(JNIEnv *env, jclass clazz, jobject method, jobjectArray ar
                     applicationInfoField.set(packageInfo, applicationInfo);
                     auto signingInfoField = packageInfoClass.getField("signingInfo", "Landroid/content/pm/SigningInfo;");
                     auto signingInfo = signingInfoField.get(packageInfo);
-                    
+
                     Class signingInfoClass("android/content/pm/SigningInfo");
                     auto mSigningDetailsField = signingInfoClass.getField("mSigningDetails", "Landroid/content/pm/PackageParser$SigningDetails;");
                     auto mSigningDetails = mSigningDetailsField.get(signingInfo);
-                    
+
                     Class signingDetailsClass("android/content/pm/PackageParser$SigningDetails");
                     auto signaturesField = signingDetailsClass.getField("signatures", "[Landroid/content/pm/Signature;");
                     auto pastSigningCertificatesField = signingDetailsClass.getField("pastSigningCertificates", "[Landroid/content/pm/Signature;");
@@ -703,7 +673,7 @@ jobject processInvoke(JNIEnv *env, jclass clazz, jobject method, jobjectArray ar
                 auto mInitiatingPackageSigningInfoField = installSourceInfoClass.getField("mInitiatingPackageSigningInfo", "Landroid/content/pm/SigningInfo;");
                 auto mOriginatingPackageNameField = installSourceInfoClass.getField("mOriginatingPackageName", "Ljava/lang/String;");
                 auto mInstallingPackageNameField = installSourceInfoClass.getField("mInstallingPackageName", "Ljava/lang/String;");
-                
+
                 Class signingInfoClass("android/content/pm/SigningInfo");
 
                 auto mInitiatingPackageName = mInitiatingPackageNameField.get(result);
