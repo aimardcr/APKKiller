@@ -21,7 +21,7 @@ void Types::Load(JNIEnv *env) {
     env->PushLocalFrame(16);
 
 #define LOAD_CLASS(c, s)        clazz = env->FindClass(s); c = reinterpret_cast<jclass>(env->NewWeakGlobalRef(clazz))
-#define LOAD_LANG_CLASS(c, s)   LOAD_CLASS(java_lang_##c, "java/lang/" #c); java_lang_##c##_init = env->GetMethodID(java_lang_##c, "<init>", s)
+#define LOAD_LANG_CLASS(c, s)   LOAD_CLASS(java_lang_##c, "java/lang/" #c); java_lang_##c##_init = env->GetMethodID(java_lang_##c, "<initMethod>", s)
 
     LOAD_LANG_CLASS(Integer, "(I)V");
     LOAD_LANG_CLASS(Long, "(J)V");

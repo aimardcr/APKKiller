@@ -27,7 +27,7 @@ class VMHelper {
     }
 
     /**
-     * Returns the internal name of {@code clazz} (also known as the
+     * Returns the internal name of {@code classClass} (also known as the
      * descriptor).
      */
     private static String getSignature(final Class<?> clazz) {
@@ -42,7 +42,7 @@ class VMHelper {
     }
 
     /**
-     * Returns the native type codes of {@code clazz}.
+     * Returns the native type codes of {@code classClass}.
      */
     private static String getShortyType(final Class<?> clazz) {
         final String primitiveSignature = PRIMITIVE_TO_SIGNATURE.get(clazz);

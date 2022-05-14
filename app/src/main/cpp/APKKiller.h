@@ -2,6 +2,9 @@
 #include <iostream>
 #include <vector>
 #include <jni.h>
+#include <thread>
+#include <future>
+#include <unordered_map>
 
 #include <unistd.h>
 #include <fcntl.h>
@@ -14,260 +17,42 @@
 #include <android/log.h>
 
 #include <whale.h>
-#include "ElfImg.h"
 
+#include "ElfImg.h"
 #include "Utils.h"
-#include "BinaryReader.h"
 
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, "APKKiller", __VA_ARGS__)
 
 #define apk_asset_path "original.apk" // assets/original.apk
 #define apk_fake_name "original.apk" // /data/data/<package_name>/cache/original.apk
-std::vector<std::vector<uint8_t>> apk_signatures{{}}; // if you fill this, it will ignore the m_APKSign from APKKiller.java
+std::vector<std::vector<uint8_t>> apk_signatures {{}}; // if you fill this, it will ignore the m_APKSign from APKKiller.java
 
-namespace APKKiller {
-    JNIEnv *g_env;
-    jstring g_apkPath;
-    jobject g_packageManager;
-    jobject g_proxy;
-    std::string g_apkPkg;
-    int APILevel;
+JavaVM *g_vm;
+JNIEnv *g_env;
+std::string g_pkgName;
+jstring g_apkPath;
+jobject g_proxy, g_pkgMgr;
 
-    class Reference {
-    public:
-        jobject reference;
-    public:
-        Reference(jobject reference) {
-            this->reference = g_env->NewGlobalRef(reference);
-        }
-        ~Reference() {
-            g_env->DeleteGlobalRef(reference);
-        }
-
-        jobject get() {
-            auto referenceClass = g_env->FindClass("java/lang/ref/Reference");
-            auto get = g_env->GetMethodID(referenceClass, "get", "()Ljava/lang/Object;");
-            auto result = g_env->CallObjectMethod(reference, get);
-            g_env->DeleteLocalRef(referenceClass);
-            return result;
-        }
-    };
-
-    class WeakReference : public Reference {
-    public:
-        WeakReference(jobject weakReference) : Reference(weakReference) {
-        }
-
-        static jobject Create(jobject obj) {
-            auto weakReferenceClass = g_env->FindClass("java/lang/ref/WeakReference");
-            auto weakReferenceClassConstructor = g_env->GetMethodID(weakReferenceClass, "<init>", "(Ljava/lang/Object;)V");
-            auto result = g_env->NewObject(weakReferenceClass, weakReferenceClassConstructor, obj);
-            g_env->DeleteLocalRef(weakReferenceClass);
-            return result;
-        }
-    };
-
-    class ArrayList {
-    private:
-        jobject arrayList;
-    public:
-        ArrayList(jobject arrayList) {
-            this->arrayList = g_env->NewGlobalRef(arrayList);
-        }
-        ~ArrayList() {
-            g_env->DeleteGlobalRef(arrayList);
-        }
-
-        jobject getObj() {
-            return arrayList;
-        }
-
-        jobject get(int index) {
-            auto arrayListClass = g_env->FindClass("java/util/ArrayList");
-            auto getMethod = g_env->GetMethodID(arrayListClass, "get", "(I)Ljava/lang/Object;");
-            auto result = g_env->NewGlobalRef(g_env->CallObjectMethod(arrayList, getMethod, index));
-            g_env->DeleteLocalRef(arrayListClass);
-            return result;
-        }
-
-        void set(int index, jobject value) {
-            auto arrayListClass = g_env->FindClass("java/util/ArrayList");
-            auto setMethod = g_env->GetMethodID(arrayListClass, "set", "(ILjava/lang/Object;)Ljava/lang/Object;");
-            g_env->CallObjectMethod(arrayList, setMethod, index, value);
-            g_env->DeleteLocalRef(arrayListClass);
-        }
-
-        int size() {
-            auto arrayListClass = g_env->FindClass("java/util/ArrayList");
-            auto sizeMethod = g_env->GetMethodID(arrayListClass, "size", "()I");
-            auto result = g_env->CallIntMethod(arrayList, sizeMethod);
-            g_env->DeleteLocalRef(arrayListClass);
-            return result;
-        }
-    };
-
-    class ArrayMap {
-    private:
-        jobject arrayMap;
-    public:
-        ArrayMap(jobject arrayMap) {
-            this->arrayMap = g_env->NewGlobalRef(arrayMap);
-        }
-        ~ArrayMap() {
-            g_env->DeleteGlobalRef(arrayMap);
-        }
-
-        jobject getObj() {
-            return arrayMap;
-        }
-
-        jobject valueAt(int index) {
-            auto arrayMapClass = g_env->FindClass("android/util/ArrayMap");
-            auto valueAtMethod = g_env->GetMethodID(arrayMapClass, "valueAt", "(I)Ljava/lang/Object;");
-            auto result = g_env->CallObjectMethod(arrayMap, valueAtMethod, index);
-            g_env->DeleteLocalRef(arrayMapClass);
-            return result;
-        }
-
-        jobject setValueAt(int index, jobject value) {
-            auto arrayMapClass = g_env->FindClass("android/util/ArrayMap");
-            auto setValueAtMethod = g_env->GetMethodID(arrayMapClass, "setValueAt", "(ILjava/lang/Object;)Ljava/lang/Object;");
-            auto result = g_env->CallObjectMethod(arrayMap, setValueAtMethod, index, value);
-            g_env->DeleteLocalRef(arrayMapClass);
-            return result;
-        }
-
-        int size() {
-            auto arrayMapClass = g_env->FindClass("android/util/ArrayMap");
-            auto sizeMethod = g_env->GetMethodID(arrayMapClass, "size", "()I");
-            auto result = g_env->CallIntMethod(arrayMap, sizeMethod);
-            return result;
-        }
-    };
-
-    class Field {
-    private:
-        jclass clazz;
-        jfieldID field;
-        bool isStatic;
-    public:
-        Field(jclass clazz, jfieldID field, bool isStatic) {
-            this->clazz = clazz;
-            this->field = field;
-            this->isStatic = isStatic;
-        }
-
-        void set(jobject obj, jobject value) {
-            if (isStatic) {
-                g_env->SetStaticObjectField(clazz, field, value);
-            } else {
-                g_env->SetObjectField(obj, field, value);
-            }
-        }
-
-        jobject get(jobject obj) {
-            if (isStatic) {
-                return g_env->GetStaticObjectField(clazz, field);
-            } else {
-                return g_env->GetObjectField(obj, field);
-            }
-        }
-
-        jint getInt(jobject obj) {
-            if (isStatic) {
-                return g_env->GetStaticIntField(clazz, field);
-            } else {
-                return g_env->GetIntField(obj, field);
-            }
-        }
-    };
-
-    // This is for Java Reflection Method, so getMethod and getStaticMethod in Class class is not used here.
-    class Method {
-    private:
-        jobject method;
-    public:
-        Method(jobject method) {
-            this->method = method;
-        }
-        ~Method() {
-            LOGI("~Method");
-            g_env->DeleteLocalRef(method);
-        }
-
-        const char *getName() {
-            auto methodClass = g_env->FindClass("java/lang/reflect/Method");
-            auto getNameMethod = g_env->GetMethodID(methodClass, "getName", "()Ljava/lang/String;");
-            auto methodName = g_env->CallObjectMethod(method, getNameMethod);
-            auto result = g_env->GetStringUTFChars((jstring) methodName, 0);
-            g_env->DeleteLocalRef(methodName);
-            g_env->DeleteLocalRef(methodClass);
-            return result;
-        }
-
-        jobject invoke(jobject object, jobjectArray args = 0) {
-            auto methodClass = g_env->FindClass("java/lang/reflect/Method");
-            auto invokeMethod = g_env->GetMethodID(methodClass, "invoke", "(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;");
-            auto result = g_env->NewGlobalRef(g_env->CallObjectMethod(method, invokeMethod, object, args));
-            g_env->DeleteLocalRef(methodClass);
-            return result;
-        }
-    };
-
-    class Class {
-    private:
-        jclass clazz;
-    public:
-        Class(const char *className) {
-            clazz = g_env->FindClass(className);
-        }
-
-        ~Class() {
-            LOGI("~Class");
-            g_env->DeleteLocalRef(clazz);
-        }
-
-        jclass getClass() {
-            return clazz;
-        }
-
-        Field getField(const char *fieldName, const char *fieldSig) {
-            auto field = g_env->GetFieldID(clazz, fieldName, fieldSig);
-            if (g_env->ExceptionCheck()) {
-                g_env->ExceptionDescribe();
-                g_env->ExceptionClear();
-            }
-            LOGI("Field %s(%s): %p", fieldName, fieldSig, field);
-            return Field(clazz, field, false);
-        }
-
-        Field getStaticField(const char *fieldName, const char *fieldSig) {
-            auto field = g_env->GetStaticFieldID(clazz, fieldName, fieldSig);
-            if (g_env->ExceptionCheck()) {
-                g_env->ExceptionDescribe();
-                g_env->ExceptionClear();
-            }
-            LOGI("Field %s(%s): %p", fieldName, fieldSig, field);
-            return Field(clazz, field, true);
-        }
-
-        jmethodID getMethod(const char *methodName, const char *methodSig) {
-            auto method = g_env->GetMethodID(clazz, methodName, methodSig);
-            if (g_env->ExceptionCheck()) {
-                g_env->ExceptionDescribe();
-                g_env->ExceptionClear();
-            }
-            LOGI("Method %s(%s): %p", methodName, methodSig, method);
-            return method;
-        }
-    };
+const char *getProcessName() {
+    FILE *f = fopen("/proc/self/cmdline", "rb");
+    if (f) {
+        char *buf = new char[64];
+        fread(buf, sizeof(char), 64, f);
+        fclose(f);
+        return buf;
+    }
+    return 0;
 }
 
-using namespace APKKiller;
+std::string getPackageName(jobject obj) {
+    auto contextClass = g_env->FindClass("android/content/Context");
+    auto getPackageNameMethod = g_env->GetMethodID(contextClass, "getPackageName", "()Ljava/lang/String;");
+    return g_env->GetStringUTFChars((jstring) g_env->CallObjectMethod(obj, getPackageNameMethod), 0);
+}
 
 jobject getApplicationContext(jobject obj) {
-    auto contextWrapperClass = g_env->FindClass("android/content/ContextWrapper");
-    auto getApplicationContextMethod = g_env->GetMethodID(contextWrapperClass, "getApplicationContext", "()Landroid/content/Context;");
+    auto contextClass = g_env->FindClass("android/content/Context");
+    auto getApplicationContextMethod = g_env->GetMethodID(contextClass, "getApplicationContext", "()Landroid/content/Context;");
     return g_env->CallObjectMethod(obj, getApplicationContextMethod);
 }
 
@@ -277,75 +62,321 @@ jobject getPackageManager(jobject obj) {
     return g_env->CallObjectMethod(obj, getPackageManagerMethod);
 }
 
-std::string getPackageName(jobject obj) {
-    auto contextClass = g_env->FindClass("android/content/Context");
-    auto getPackageNameMethod = g_env->GetMethodID(contextClass, "getPackageName", "()Ljava/lang/String;");
-    auto packageName = (jstring) g_env->CallObjectMethod(obj, getPackageNameMethod);
-    return g_env->GetStringUTFChars(packageName, 0);
-}
+class Reference {
+public:
+    JNIEnv *env;
+    jobject reference;
+public:
+    Reference(JNIEnv *env, jobject obj) {
+        this->env = env;
+        this->reference = env->NewGlobalRef(obj);
+    }
+
+    Reference(jobject reference) {
+        this->env = g_env;
+        this->reference = reference;
+    }
+
+    jobject get() {
+        auto referenceClass = env->FindClass("java/lang/ref/Reference");
+        auto get = env->GetMethodID(referenceClass, "get", "()Ljava/lang/Object;");
+        return env->CallObjectMethod(reference, get);
+    }
+};
+
+class WeakReference : public Reference {
+public:
+    WeakReference(JNIEnv *env, jobject weakReference) : Reference(env, weakReference) {
+    }
+
+    WeakReference(jobject weakReference) : Reference(weakReference) {
+    }
+
+    static jobject Create(jobject obj) {
+        auto weakReferenceClass = g_env->FindClass("java/lang/ref/WeakReference");
+        auto weakReferenceClassConstructor = g_env->GetMethodID(weakReferenceClass, "<init>", "(Ljava/lang/Object;)V");
+        return g_env->NewObject(weakReferenceClass, weakReferenceClassConstructor, obj);
+    }
+};
+
+class ArrayList {
+private:
+    JNIEnv *env;
+    jobject arrayList;
+public:
+    ArrayList(JNIEnv *env, jobject arrayList) {
+        this->env = env;
+        this->arrayList = arrayList;
+    }
+
+    ArrayList(jobject arrayList) {
+        this->env = g_env;
+        this->arrayList = arrayList;
+    }
+
+    jobject getObj() {
+        return arrayList;
+    }
+
+    jobject get(int index) {
+        auto arrayListClass = env->FindClass("java/util/ArrayList");
+        auto getMethod = env->GetMethodID(arrayListClass, "get", "(I)Ljava/lang/Object;");
+        return env->CallObjectMethod(arrayList, getMethod, index);
+    }
+
+    void set(int index, jobject value) {
+        auto arrayListClass = env->FindClass("java/util/ArrayList");
+        auto setMethod = env->GetMethodID(arrayListClass, "set", "(ILjava/lang/Object;)Ljava/lang/Object;");
+        env->CallObjectMethod(arrayList, setMethod, index, value);
+    }
+
+    int size() {
+        auto arrayListClass = env->FindClass("java/util/ArrayList");
+        auto sizeMethod = env->GetMethodID(arrayListClass, "size", "()I");
+        return env->CallIntMethod(arrayList, sizeMethod);
+    }
+};
+
+class ArrayMap {
+private:
+    JNIEnv *env;
+    jobject arrayMap;
+public:
+    ArrayMap(JNIEnv *env, jobject arrayMap) {
+        this->env = env;
+        this->arrayMap = arrayMap;
+    }
+
+    ArrayMap(jobject arrayMap) {
+        this->env = g_env;
+        this->arrayMap = arrayMap;
+    }
+
+    jobject getObj() {
+        return arrayMap;
+    }
+
+    jobject valueAt(int index) {
+        auto arrayMapClass = env->FindClass("android/util/ArrayMap");
+        auto valueAtMethod = env->GetMethodID(arrayMapClass, "valueAt", "(I)Ljava/lang/Object;");
+        return env->CallObjectMethod(arrayMap, valueAtMethod, index);
+    }
+
+    jobject setValueAt(int index, jobject value) {
+        auto arrayMapClass = env->FindClass("android/util/ArrayMap");
+        auto setValueAtMethod = env->GetMethodID(arrayMapClass, "setValueAt", "(ILjava/lang/Object;)Ljava/lang/Object;");
+        return env->CallObjectMethod(arrayMap, setValueAtMethod, index, value);
+    }
+
+    int size() {
+        auto arrayMapClass = env->FindClass("android/util/ArrayMap");
+        auto sizeMethod = env->GetMethodID(arrayMapClass, "size", "()I");
+        return env->CallIntMethod(arrayMap, sizeMethod);
+    }
+};
+
+class Method {
+private:
+    JNIEnv *env;
+    jobject method;
+    jmethodID getNameMethod;
+    jmethodID invokeMethod;
+
+    void initMethod(jobject method) {
+        this->method = method;
+
+        jclass methodClass = env->FindClass("java/lang/reflect/Method");
+        getNameMethod = env->GetMethodID(methodClass, "getName", "()Ljava/lang/String;");
+        invokeMethod = env->GetMethodID(methodClass, "invoke", "(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;");
+
+        auto setAccessibleMethod = env->GetMethodID(methodClass, "setAccessible", "(Z)V");
+        env->CallVoidMethod(method, setAccessibleMethod, true);
+    }
+
+public:
+    Method(JNIEnv *env, jobject method) {
+        this->env = env;
+        initMethod(method);
+    }
+
+    Method(jobject method) {
+        this->env = g_env;
+        initMethod(method);
+    }
+
+    ~Method() {
+        env->DeleteLocalRef(method);
+    }
+
+    const char *getName() {
+        return env->GetStringUTFChars((jstring) env->CallObjectMethod(method, getNameMethod), 0);
+    }
+
+    jobject invoke(jobject object, jobjectArray args = 0) {
+        return env->CallObjectMethod(method, invokeMethod, object, args);
+    }
+};
+
+class Field {
+private:
+    JNIEnv *env;
+    jobject field;
+    jmethodID getMethod;
+    jmethodID setMethod;
+public:
+    Field(JNIEnv *env, jobject field) {
+        this->env = env;
+        this->field = field;
+
+        jclass fieldClass = env->FindClass("java/lang/reflect/Field");
+        getMethod = env->GetMethodID(fieldClass, "get", "(Ljava/lang/Object;)Ljava/lang/Object;");
+        setMethod = env->GetMethodID(fieldClass, "set", "(Ljava/lang/Object;Ljava/lang/Object;)V");
+
+        auto setAccessibleMethod = env->GetMethodID(fieldClass, "setAccessible", "(Z)V");
+        env->CallVoidMethod(field, setAccessibleMethod, true);
+    }
+
+    ~Field() {
+        env->DeleteGlobalRef(field);
+    }
+
+    jobject getField() {
+        return field;
+    }
+
+    jobject get(jobject obj) {
+        return env->CallObjectMethod(field, getMethod, obj);
+    }
+
+    void set(jobject obj, jobject value) {
+        env->CallVoidMethod(field, setMethod, obj, value);
+    }
+};
+
+class Class {
+private:
+    JNIEnv *env;
+    jobject clazz;
+
+    void initClass(const char *className) {
+        auto classClass = env->FindClass("java/lang/Class");
+        auto forNameMethod = env->GetStaticMethodID(classClass, "forName", "(Ljava/lang/String;)Ljava/lang/Class;");
+        clazz = env->NewGlobalRef(env->CallStaticObjectMethod(classClass, forNameMethod, env->NewStringUTF(className)));
+    }
+
+public:
+    Class(JNIEnv *env, const char *className) {
+        this->env = env;
+        initClass(className);
+    }
+
+    Class(const char *className) {
+        this->env = g_env;
+        initClass(className);
+    }
+
+    ~Class() {
+        env->DeleteGlobalRef(clazz);
+    }
+
+    jobject getClass() {
+        return clazz;
+    }
+
+    Field getField(const char *fieldName) {
+        auto future = std::async([&]() -> jobject {
+            JNIEnv *env;
+            g_vm->AttachCurrentThread(&env, NULL);
+
+            auto classClass = env->FindClass("java/lang/Class");
+            jmethodID getDeclaredFieldMethod = env->GetMethodID(classClass, "getDeclaredField", "(Ljava/lang/String;)Ljava/lang/reflect/Field;");
+
+            auto fieldNameObj = env->NewStringUTF(fieldName);
+            auto result = env->CallObjectMethod(clazz, getDeclaredFieldMethod, fieldNameObj);
+            if (env->ExceptionCheck()) {
+                env->ExceptionDescribe();
+                env->ExceptionClear();
+            }
+
+            if (result) {
+                result = env->NewGlobalRef(result);
+            }
+
+            env->DeleteLocalRef(fieldNameObj);
+            env->DeleteLocalRef(classClass);
+
+            g_vm->DetachCurrentThread();
+            return result;
+        });
+        return Field(env, future.get());
+    }
+};
 
 void patch_ApplicationInfo(jobject obj) {
-    if (!obj) return;
-    LOGI("-------- Patching ApplicationInfo - %p", obj);
-    Class applicationInfoClass("android/content/pm/ApplicationInfo");
+    if (obj) {
+        LOGI("-------- Patching ApplicationInfo - %p", obj);
+        Class applicationInfoClass("android.content.pm.ApplicationInfo");
 
-    auto sourceDirField = applicationInfoClass.getField("sourceDir", "Ljava/lang/String;");
-    auto publicSourceDirField = applicationInfoClass.getField("publicSourceDir", "Ljava/lang/String;");
+        auto sourceDirField = applicationInfoClass.getField("sourceDir");
+        auto publicSourceDirField = applicationInfoClass.getField("publicSourceDir");
 
-    sourceDirField.set(obj, g_apkPath);
-    publicSourceDirField.set(obj, g_apkPath);
+        sourceDirField.set(obj, g_apkPath);
+        publicSourceDirField.set(obj, g_apkPath);
+    }
 }
 
 void patch_LoadedApk(jobject obj) {
-    if (!obj) return;
-    LOGI("-------- Patching LoadedApk - %p", obj);
-    Class loadedApkClass("android/app/LoadedApk");
+    if (obj) {
+        LOGI("-------- Patching LoadedApk - %p", obj);
+        Class loadedApkClass("android.app.LoadedApk");
 
-    auto mApplicationInfoField = loadedApkClass.getField("mApplicationInfo", "Landroid/content/pm/ApplicationInfo;");
-    patch_ApplicationInfo(mApplicationInfoField.get(obj));
+        auto mApplicationInfoField = loadedApkClass.getField("mApplicationInfo");
+        patch_ApplicationInfo(mApplicationInfoField.get(obj));
 
-    auto mAppDirField = loadedApkClass.getField("mAppDir", "Ljava/lang/String;");
-    auto mResDirField = loadedApkClass.getField("mResDir", "Ljava/lang/String;");
+        auto mAppDirField = loadedApkClass.getField("mAppDir");
+        auto mResDirField = loadedApkClass.getField("mResDir");
 
-    mAppDirField.set(obj, g_apkPath);
-    mResDirField.set(obj, g_apkPath);
+        mAppDirField.set(obj, g_apkPath);
+        mResDirField.set(obj, g_apkPath);
+    }
 }
 
 void patch_AppBindData(jobject obj) {
-    if (!obj) return;
-    LOGI("-------- Patching AppBindData - %p", obj);
-    Class appBindDataClass("android/app/ActivityThread$AppBindData");
+    if (obj) {
+        LOGI("-------- Patching AppBindData - %p", obj);
+        Class appBindDataClass("android.app.ActivityThread$AppBindData");
 
-    auto infoField = appBindDataClass.getField("info", "Landroid/app/LoadedApk;");
-    patch_LoadedApk(infoField.get(obj));
+        auto infoField = appBindDataClass.getField("info");
+        patch_LoadedApk(infoField.get(obj));
 
-    auto appInfoField = appBindDataClass.getField("appInfo", "Landroid/content/pm/ApplicationInfo;");
-    patch_ApplicationInfo(appInfoField.get(obj));
+        auto appInfoField = appBindDataClass.getField("appInfo");
+        patch_ApplicationInfo(appInfoField.get(obj));
+    }
 }
 
 void patch_ContextImpl(jobject obj) {
-    if (!obj) return;
-    Class contextImplClass("android/app/ContextImpl");
-    if (g_env->IsInstanceOf(obj, contextImplClass.getClass())) {
+    if (obj) {
         LOGI("-------- Patching ContextImpl - %p", obj);
-        auto mPackageInfoField = contextImplClass.getField("mPackageInfo", "Landroid/app/LoadedApk;");
+        Class contextImplClass("android.app.ContextImpl");
+
+        auto mPackageInfoField = contextImplClass.getField("mPackageInfo");
         patch_LoadedApk(mPackageInfoField.get(obj));
 
-        auto mPackageManagerField = contextImplClass.getField("mPackageManager", "Landroid/content/pm/PackageManager;");
+        auto mPackageManagerField = contextImplClass.getField("mPackageManager");
         mPackageManagerField.set(obj, g_proxy);
     }
 }
 
 void patch_Application(jobject obj) {
-    if (!obj) return;
-    Class applicationClass("android/app/Application");
-    if (g_env->IsInstanceOf(obj, applicationClass.getClass())) {
+    if (obj) {
         LOGI("-------- Patching Application - %p", obj);
-        auto mLoadedApkField = applicationClass.getField("mLoadedApk", "Landroid/app/LoadedApk;");
-        patch_LoadedApk(mLoadedApkField.get(obj));
-    }
+        Class applicationClass("android.app.Application");
 
-    patch_ContextImpl(getApplicationContext(obj));
+        auto mLoadedApkField = applicationClass.getField("mLoadedApk");
+        patch_LoadedApk(mLoadedApkField.get(obj));
+
+        // patch_ContextImpl(getApplicationContext(obj));
+    }
 }
 
 AAssetManager *g_assetManager;
@@ -364,7 +395,7 @@ void extractAsset(std::string assetName, std::string extractPath) {
         return;
     }
 
-    const int BUFFER_SIZE = 512;
+    const int BUFFER_SIZE = 1024;
     char buffer[BUFFER_SIZE];
     int bytesRead;
     while ((bytesRead = AAsset_read(asset, buffer, BUFFER_SIZE)) > 0) {
@@ -383,14 +414,14 @@ void extractAsset(std::string assetName, std::string extractPath) {
 void patch_PackageManager(jobject obj) {
     if (!obj) return;
 
-    Class activityThreadClass("android/app/ActivityThread");
-    auto sCurrentActivityThreadField = activityThreadClass.getStaticField("sCurrentActivityThread", "Landroid/app/ActivityThread;");
+    Class activityThreadClass("android.app.ActivityThread");
+    auto sCurrentActivityThreadField = activityThreadClass.getField("sCurrentActivityThread");
     auto sCurrentActivityThread = sCurrentActivityThreadField.get(NULL);
 
-    auto sPackageManagerField = activityThreadClass.getStaticField("sPackageManager", "Landroid/content/pm/IPackageManager;");
-    g_packageManager = g_env->NewGlobalRef(sPackageManagerField.get(NULL));
+    auto sPackageManagerField = activityThreadClass.getField("sPackageManager");
+    g_pkgMgr = g_env->NewGlobalRef(sPackageManagerField.get(NULL));
 
-    Class iPackageManagerClass("android/content/pm/IPackageManager");
+    Class iPackageManagerClass("android.content.pm.IPackageManager");
 
     auto classClass = g_env->FindClass("java/lang/Class");
     auto getClassLoaderMethod = g_env->GetMethodID(classClass, "getClassLoader", "()Ljava/lang/ClassLoader;");
@@ -410,48 +441,22 @@ void patch_PackageManager(jobject obj) {
     sPackageManagerField.set(sCurrentActivityThread, g_proxy);
 
     auto pm = getPackageManager(obj);
-    Class applicationPackageManagerClass("android/app/ApplicationPackageManager");
-    auto mPMField = applicationPackageManagerClass.getField("mPM", "Landroid/content/pm/IPackageManager;");
+    Class applicationPackageManagerClass("android.app.ApplicationPackageManager");
+    auto mPMField = applicationPackageManagerClass.getField("mPM");
     mPMField.set(pm, g_proxy);
 }
 
-void BypassHiddenAPI(JNIEnv *env) {
-    std::vector<std::string> symbols = {
-        // Android 10 - 12
-        "_ZN3art9hiddenapi24ShouldDenyAccessToMemberINS_8ArtFieldEEEbPT_RKNSt3__18functionIFNS0_13AccessContextEvEEENS0_12AccessMethodE",
-        "_ZN3art9hiddenapi24ShouldDenyAccessToMemberINS_9ArtMethodEEEbPT_RKNSt3__18functionIFNS0_13AccessContextEvEEENS0_12AccessMethodE",
-        "_ZN3art9hiddenapi6detail28ShouldDenyAccessToMemberImplINS_8ArtFieldEEEbPT_NS0_7ApiListENS0_12AccessMethodE",
-        "_ZN3art9hiddenapi6detail28ShouldDenyAccessToMemberImplINS_9ArtMethodEEEbPT_NS0_7ApiListENS0_12AccessMethodE",
-        // Android 9
-        "_ZN3art9ArtMethod23GetHiddenApiAccessFlagsEv",
-        "_ZN3art9hiddenapi6detail15MemberSignature10IsExemptedERKNSt3__16vectorINS3_12basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEENS8_ISA_EEEE",
-        "_ZN3artL26VMRuntime_hasUsedHiddenApiEP7_JNIEnvP8_jobject"
-    };
-
-    ElfImg art("libart.so");
-    for (auto &symbol : symbols) {
-        auto address = (void *) art.getSymbolAddress(symbol);
-        if (address) {
-            WInlineHookFunction(address, (void *) (+[]() {
-                return 0;
-            }), 0);
-        }
-    }
-}
-
 void APKKill(JNIEnv *env, jclass clazz, jobject context) {
-    LOGI("-------- Killing APK");
+    env->PushLocalFrame(256); // We call this so that we don't need to manually delete the local refs
 
-    APKKiller::g_env = env;
+    g_env = env;
     g_assetManager = AAssetManager_fromJava(env, env->CallObjectMethod(context, env->GetMethodID(env->FindClass("android/content/Context"), "getAssets", "()Landroid/content/res/AssetManager;")));
 
-    auto versionClass = env->FindClass("android/os/Build$VERSION");
-    APKKiller::APILevel = env->GetStaticIntField(versionClass, env->GetStaticFieldID(versionClass, "SDK_INT", "I"));
-
     std::string apkPkg = getPackageName(context);
-    APKKiller::g_apkPkg = apkPkg;
+    g_pkgName = apkPkg;
 
-    LOGI("-------- Killing %s", apkPkg.c_str());
+    auto procName = getProcessName();
+    LOGI("-------- Killing %s", procName);
 
     char apkDir[512];
     sprintf(apkDir, "/data/data/%s/cache", apkPkg.c_str());
@@ -466,44 +471,19 @@ void APKKill(JNIEnv *env, jclass clazz, jobject context) {
         extractAsset(apk_asset_path, apkPath);
     }
 
-    APKKiller::g_apkPath = (jstring) env->NewGlobalRef(g_env->NewStringUTF(apkPath.c_str()));
+    g_apkPath = (jstring) env->NewGlobalRef(g_env->NewStringUTF(apkPath.c_str()));
 
-    BypassHiddenAPI(env);
-
-    auto apkKillerClass = g_env->FindClass("com/kuro/APKKiller");
-    auto javaKillerMethod = g_env->GetStaticMethodID(apkKillerClass, "Kill", "()V");
-    g_env->CallStaticVoidMethod(apkKillerClass, javaKillerMethod);
-
-    if (apk_signatures.empty()) {
-        auto m_APKSignField = g_env->GetStaticFieldID(apkKillerClass, "m_APKSign", "Ljava/lang/String;");
-        auto m_APKSign = g_env->GetStringUTFChars((jstring) g_env->GetStaticObjectField(apkKillerClass, m_APKSignField), NULL);
-        {
-            auto signs = base64_decode(m_APKSign);
-            BinaryReader reader(signs.data(), signs.size());
-            apk_signatures.resize(reader.readInt8());
-            for (int i = 0; i < apk_signatures.size(); i++) {
-                size_t size = reader.readInt32(), n;
-                apk_signatures[i].resize(size);
-
-                uint8_t sign[size];
-                if ((n = reader.read(sign, size)) > 0) {
-                    memcpy(apk_signatures[i].data(), sign, n);
-                }
-            }
-        }
-    }
-
-    Class activityThreadClass("android/app/ActivityThread");
-    auto sCurrentActivityThreadField = activityThreadClass.getStaticField("sCurrentActivityThread", "Landroid/app/ActivityThread;");
+    Class activityThreadClass("android.app.ActivityThread");
+    auto sCurrentActivityThreadField = activityThreadClass.getField("sCurrentActivityThread");
     auto sCurrentActivityThread = sCurrentActivityThreadField.get(NULL);
 
-    auto mBoundApplicationField = activityThreadClass.getField("mBoundApplication", "Landroid/app/ActivityThread$AppBindData;");
+    auto mBoundApplicationField = activityThreadClass.getField("mBoundApplication");
     patch_AppBindData(mBoundApplicationField.get(sCurrentActivityThread));
 
-    auto mInitialApplicationField = activityThreadClass.getField("mInitialApplication", "Landroid/app/Application;");
+    auto mInitialApplicationField = activityThreadClass.getField("mInitialApplication");
     patch_Application(mInitialApplicationField.get(sCurrentActivityThread));
 
-    auto mAllApplicationsField = activityThreadClass.getField("mAllApplications", "Ljava/util/ArrayList;");
+    auto mAllApplicationsField = activityThreadClass.getField("mAllApplications");
     auto mAllApplications = mAllApplicationsField.get(sCurrentActivityThread);
     ArrayList list(mAllApplications);
     for (int i = 0; i < list.size(); i++) {
@@ -513,7 +493,7 @@ void APKKill(JNIEnv *env, jclass clazz, jobject context) {
     }
     mAllApplicationsField.set(sCurrentActivityThread, list.getObj());
 
-    auto mPackagesField = activityThreadClass.getField("mPackages", "Landroid/util/ArrayMap;");
+    auto mPackagesField = activityThreadClass.getField("mPackages");
     auto mPackages = mPackagesField.get(sCurrentActivityThread);
     ArrayMap mPackagesMap(mPackages);
     for (int i = 0; i < mPackagesMap.size(); i++) {
@@ -523,7 +503,7 @@ void APKKill(JNIEnv *env, jclass clazz, jobject context) {
     }
     mPackagesField.set(sCurrentActivityThread, mPackagesMap.getObj());
 
-    auto mResourcePackagesField = activityThreadClass.getField("mResourcePackages", "Landroid/util/ArrayMap;");
+    auto mResourcePackagesField = activityThreadClass.getField("mResourcePackages");
     auto mResourcePackages = mResourcePackagesField.get(sCurrentActivityThread);
     ArrayMap mResourcePackagesMap(mResourcePackages);
     for (int i = 0; i < mResourcePackagesMap.size(); i++) {
@@ -533,55 +513,45 @@ void APKKill(JNIEnv *env, jclass clazz, jobject context) {
     }
     mResourcePackagesField.set(sCurrentActivityThread, mResourcePackagesMap.getObj());
 
-    patch_ContextImpl(context);
+    // patch_ContextImpl(getApplicationContext(context));
     patch_PackageManager(context);
+
+    env->PopLocalFrame(0);
 }
 
 jobject processInvoke(JNIEnv *env, jclass clazz, jobject method, jobjectArray args) {
-    g_env = env;
+    env->PushLocalFrame(256);
 
-    auto String_fromParam = [env, args](int idx) -> const char * {
-        auto param = env->GetObjectArrayElement(args, idx);
-        if (!param) {
-            return 0;
-        }
-        auto result = env->GetStringUTFChars((jstring) param, NULL);
-        env->DeleteLocalRef(param);
-        return result;
-    };
-
-    auto Integer_fromParam = [env, args](int idx) -> int {
-        auto param = env->GetObjectArrayElement(args, idx);
-        if (!param) {
-            return 0;
-        }
+    auto Integer_intValue = [&](jobject param) -> int {
         auto integerClass = env->FindClass("java/lang/Integer");
         auto intValueMethod = env->GetMethodID(integerClass, "intValue", "()I");
-        auto result = env->CallIntMethod(param, intValueMethod);
-        env->DeleteLocalRef(param);
-        env->DeleteLocalRef(integerClass);
-        return result;
+        return env->CallIntMethod(param, intValueMethod);
     };
 
-    Method mMethod(method);
+    Method mMethod(env, method);
     const char *mName = mMethod.getName();
-    auto mResult = mMethod.invoke(g_packageManager, args);
+    auto mResult = mMethod.invoke(g_pkgMgr, args);
 
     if (!strcmp(mName, "getPackageInfo")) {
-        const char *packageName = String_fromParam(0);
-        int flags = Integer_fromParam(1);
-        if (!strcmp(packageName, g_apkPkg.c_str())) {
-            if ((flags & 0x40) != 0) {
-                auto packageInfo = mResult;
-                if (packageInfo) {
-                    Class packageInfoClass("android/content/pm/PackageInfo");
-                    auto applicationInfoField = packageInfoClass.getField("applicationInfo", "Landroid/content/pm/ApplicationInfo;");
+        const jobject packageInfo = mResult;
+        if (packageInfo) {
+            const char *packageName = env->GetStringUTFChars((jstring) env->GetObjectArrayElement(args, 0), 0);
+            int flags = Integer_intValue(env->GetObjectArrayElement(args, 1));
+            if (!strcmp(packageName, g_pkgName.c_str())) {
+                if ((flags & 0x40) != 0) {
+                    Class packageInfoClass(env, "android.content.pm.PackageInfo");
+                    auto applicationInfoField = packageInfoClass.getField("applicationInfo");
                     auto applicationInfo = applicationInfoField.get(packageInfo);
                     if (applicationInfo) {
-                        patch_ApplicationInfo(applicationInfo);
+                        Class applicationInfoClass(env, "android.content.pm.ApplicationInfo");
+                        auto sourceDirField = applicationInfoClass.getField("sourceDir");
+                        auto publicSourceDirField = applicationInfoClass.getField("publicSourceDir");
+
+                        sourceDirField.set(applicationInfo, g_apkPath);
+                        publicSourceDirField.set(applicationInfo, g_apkPath);
                     }
                     applicationInfoField.set(packageInfo, applicationInfo);
-                    auto signaturesField = packageInfoClass.getField("signatures", "[Landroid/content/pm/Signature;");
+                    auto signaturesField = packageInfoClass.getField("signatures");
 
                     auto signatureClass = env->FindClass("android/content/pm/Signature");
                     auto signatureConstructor = env->GetMethodID(signatureClass, "<init>", "([B)V");
@@ -592,31 +562,30 @@ jobject processInvoke(JNIEnv *env, jclass clazz, jobject method, jobjectArray ar
                         env->SetObjectArrayElement(signatureArray, i, env->NewObject(signatureClass, signatureConstructor, signature));
                     }
                     signaturesField.set(packageInfo, signatureArray);
-
-                    env->DeleteLocalRef(signatureClass);
-                    env->DeleteLocalRef(signatureArray);
-                }
-                return packageInfo;
-            } else if ((flags & 0x8000000) != 0) {
-                auto packageInfo = mResult;
-                if (packageInfo) {
-                    Class packageInfoClass("android/content/pm/PackageInfo");
-                    auto applicationInfoField = packageInfoClass.getField("applicationInfo", "Landroid/content/pm/ApplicationInfo;");
+                } else if ((flags & 0x8000000) != 0) {
+                    Class packageInfoClass(env, "android.content.pm.PackageInfo");
+                    auto applicationInfoField = packageInfoClass.getField("applicationInfo");
                     auto applicationInfo = applicationInfoField.get(packageInfo);
                     if (applicationInfo) {
-                        patch_ApplicationInfo(applicationInfo);
+                        Class applicationInfoClass(env, "android.content.pm.ApplicationInfo");
+                        auto sourceDirField = applicationInfoClass.getField("sourceDir");
+                        auto publicSourceDirField = applicationInfoClass.getField("publicSourceDir");
+
+                        sourceDirField.set(applicationInfo, g_apkPath);
+                        publicSourceDirField.set(applicationInfo, g_apkPath);
                     }
                     applicationInfoField.set(packageInfo, applicationInfo);
-                    auto signingInfoField = packageInfoClass.getField("signingInfo", "Landroid/content/pm/SigningInfo;");
+
+                    auto signingInfoField = packageInfoClass.getField("signingInfo");
                     auto signingInfo = signingInfoField.get(packageInfo);
 
-                    Class signingInfoClass("android/content/pm/SigningInfo");
-                    auto mSigningDetailsField = signingInfoClass.getField("mSigningDetails", "Landroid/content/pm/PackageParser$SigningDetails;");
+                    Class signingInfoClass(env, "android.content.pm.SigningInfo");
+                    auto mSigningDetailsField = signingInfoClass.getField("mSigningDetails");
                     auto mSigningDetails = mSigningDetailsField.get(signingInfo);
 
-                    Class signingDetailsClass("android/content/pm/PackageParser$SigningDetails");
-                    auto signaturesField = signingDetailsClass.getField("signatures", "[Landroid/content/pm/Signature;");
-                    auto pastSigningCertificatesField = signingDetailsClass.getField("pastSigningCertificates", "[Landroid/content/pm/Signature;");
+                    Class signingDetailsClass(env, "android.content.pm.PackageParser$SigningDetails");
+                    auto signaturesField = signingDetailsClass.getField("signatures");
+                    auto pastSigningCertificatesField = signingDetailsClass.getField("pastSigningCertificates");
 
                     auto signatureClass = env->FindClass("android/content/pm/Signature");
                     auto signatureConstructor = env->GetMethodID(signatureClass, "<init>", "([B)V");
@@ -626,64 +595,47 @@ jobject processInvoke(JNIEnv *env, jclass clazz, jobject method, jobjectArray ar
                         env->SetByteArrayRegion(signature, 0, apk_signatures[i].size(), (jbyte *) apk_signatures[i].data());
                         env->SetObjectArrayElement(signatureArray, i, env->NewObject(signatureClass, signatureConstructor, signature));
                     }
-
-                    signaturesField.set(mSigningDetails, env->NewGlobalRef(signatureArray));
-                    pastSigningCertificatesField.set(mSigningDetails, env->NewGlobalRef(signatureArray));
-
-                    env->DeleteLocalRef(signatureClass);
-                }
-                return packageInfo;
-            } else {
-                auto packageInfo = mResult;
-                if (packageInfo) {
-                    Class packageInfoClass("android/content/pm/PackageInfo");
-                    auto applicationInfoField = packageInfoClass.getField("applicationInfo", "Landroid/content/pm/ApplicationInfo;");
+                    signaturesField.set(mSigningDetails, signatureArray);
+                    pastSigningCertificatesField.set(mSigningDetails, signatureArray);
+                } else {
+                    Class packageInfoClass(env, "android.content.pm.PackageInfo");
+                    auto applicationInfoField = packageInfoClass.getField("applicationInfo");
                     auto applicationInfo = applicationInfoField.get(packageInfo);
                     if (applicationInfo) {
-                        patch_ApplicationInfo(applicationInfo);
+                        Class applicationInfoClass(env, "android.content.pm.ApplicationInfo");
+                        auto sourceDirField = applicationInfoClass.getField("sourceDir");
+                        auto publicSourceDirField = applicationInfoClass.getField("publicSourceDir");
+
+                        sourceDirField.set(applicationInfo, g_apkPath);
+                        publicSourceDirField.set(applicationInfo, g_apkPath);
                     }
+                    applicationInfoField.set(packageInfo, applicationInfo);
                 }
-                return packageInfo;
             }
         }
     } else if (!strcmp(mName, "getApplicationInfo")) {
-        const char *packageName = String_fromParam(0);
-        if (!strcmp(packageName, g_apkPkg.c_str())) {
+        const char *packageName = env->GetStringUTFChars((jstring) env->GetObjectArrayElement(args, 0), 0);
+        if (!strcmp(packageName, g_pkgName.c_str())) {
             auto applicationInfo = mResult;
             if (applicationInfo) {
-                patch_ApplicationInfo(applicationInfo);
+                Class applicationInfoClass(env, "android.content.pm.ApplicationInfo");
+
+                auto sourceDirField = applicationInfoClass.getField("sourceDir");
+                auto publicSourceDirField = applicationInfoClass.getField("publicSourceDir");
+
+                sourceDirField.set(applicationInfo, g_apkPath);
+                publicSourceDirField.set(applicationInfo, g_apkPath);
             }
-            return applicationInfo;
         }
     } else if (!strcmp(mName, "getInstallerPackageName")) {
-        const char *packageName = String_fromParam(0);
-        if (!strcmp(packageName, g_apkPkg.c_str())) {
-            return env->NewStringUTF("com.android.vending");
-        }
-    } else if (!strcmp(mName, "getInstallSourceInfo")) {
-        const char *packageName = String_fromParam(0);
-        if (!strcmp(packageName, g_apkPkg.c_str())) {
-            auto result = mResult;
-            if (result) {
-                Class installSourceInfoClass("android/content/pm/InstallSourceInfo");
-                auto mInitiatingPackageNameField = installSourceInfoClass.getField("mInitiatingPackageName", "Ljava/lang/String;");
-                auto mInitiatingPackageSigningInfoField = installSourceInfoClass.getField("mInitiatingPackageSigningInfo", "Landroid/content/pm/SigningInfo;");
-                auto mOriginatingPackageNameField = installSourceInfoClass.getField("mOriginatingPackageName", "Ljava/lang/String;");
-                auto mInstallingPackageNameField = installSourceInfoClass.getField("mInstallingPackageName", "Ljava/lang/String;");
-
-                Class signingInfoClass("android/content/pm/SigningInfo");
-
-                auto mInitiatingPackageName = mInitiatingPackageNameField.get(result);
-                auto mOriginatingPackageName = mOriginatingPackageNameField.get(result);
-                auto mInstallingPackageName = mInstallingPackageNameField.get(result);
-
-                const char *initiatingPackageName = env->GetStringUTFChars((jstring) mInitiatingPackageName, NULL);
-                const char *originatingPackageName = env->GetStringUTFChars((jstring) mOriginatingPackageName, NULL);
-                const char *installingPackageName = env->GetStringUTFChars((jstring) mInstallingPackageName, NULL);
-
-                // TODO: Write new information then return it
-            }
+        const char *packageName = env->GetStringUTFChars((jstring) env->GetObjectArrayElement(args, 0), 0);
+        if (!strcmp(packageName, g_pkgName.c_str())) {
+            mResult = env->NewStringUTF("com.android.vending");
         }
     }
-    return mResult;
+
+    if (mResult) {
+        mResult = env->NewGlobalRef(mResult);
+    }
+    return env->PopLocalFrame(mResult); // make sure all local refs are deleted except for the result
 }

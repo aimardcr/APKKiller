@@ -27,7 +27,7 @@ static constexpr u4 kAccEnum = 0x4000;  // class, field, ic (1.5)
 
 static constexpr u4 kAccJavaFlagsMask = 0xffff;  // bits set from Java sources (low 16)
 
-static constexpr u4 kAccConstructor = 0x00010000;  // method (dex only) <(cl)init>
+static constexpr u4 kAccConstructor = 0x00010000;  // method (dex only) <(cl)initMethod>
 static constexpr u4 kAccDeclaredSynchronized = 0x00020000;  // method (dex only)
 static constexpr u4 kAccClassIsProxy = 0x00040000;  // class  (dex only)
 // Set to indicate that the ArtMethod is obsolete and has a different DexCache + DexFile from its

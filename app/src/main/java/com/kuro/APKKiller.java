@@ -7,13 +7,8 @@ import java.lang.reflect.Method;
 
 @SuppressWarnings("all")
 public class APKKiller {
-    private static String m_APKSign = ""; // Paste the base64 encoded signature here or use the C++ one instead. If you use this then the C++ wont parse the base64 in the C++
     static {
-        System.loadLibrary("kuro");
-    }
-
-    public static void Kill() {
-
+        System.loadLibrary("killer");
     }
 
     public static native void Start(Context context);
@@ -21,7 +16,7 @@ public class APKKiller {
 
     private static InvocationHandler myInvocationHandler = new InvocationHandler() {
         @Override
-        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        public Object invoke(Object proxy, Method method, Object[] args) {
             return processInvoke(method, args);
         }
     };

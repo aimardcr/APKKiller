@@ -1607,7 +1607,7 @@ public final class XposedHelpers {
     }
 
     /**
-     * Like {@link #setAdditionalInstanceField}, but the value is stored for {@code clazz}.
+     * Like {@link #setAdditionalInstanceField}, but the value is stored for {@code classClass}.
      */
     public static Object setAdditionalStaticField(final Class<?> clazz, final String key,
                                                   final Object value) {
@@ -1615,14 +1615,14 @@ public final class XposedHelpers {
     }
 
     /**
-     * Like {@link #setAdditionalInstanceField}, but the value is returned for {@code clazz}.
+     * Like {@link #setAdditionalInstanceField}, but the value is returned for {@code classClass}.
      */
     public static Object getAdditionalStaticField(final Class<?> clazz, final String key) {
         return getAdditionalInstanceField(clazz, key);
     }
 
     /**
-     * Like {@link #setAdditionalInstanceField}, but the value is removed and returned for {@code clazz}.
+     * Like {@link #setAdditionalInstanceField}, but the value is removed and returned for {@code classClass}.
      */
     public static Object removeAdditionalStaticField(final Class<?> clazz, final String key) {
         return removeAdditionalInstanceField(clazz, key);

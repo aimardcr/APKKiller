@@ -8,7 +8,7 @@ set(LINKER_FLAGS "-ffixed-x18 -Wl,--hash-style=both")
 set(C_FLAGS "-Werror=format -fdata-sections -ffunction-sections -std=c18")
 set(CXX_FLAGS "${CXX_FLAGS} -std=c++20")
 
-if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug") # Strip debug symbols
+if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(C_FLAGS "${C_FLAGS} -fvisibility=hidden -fvisibility-inlines-hidden")
     set(LINKER_FLAGS "${LINKER_FLAGS} -Wl,-exclude-libs,ALL -Wl,--gc-sections -Wl,--strip-all")
 endif ()
@@ -21,10 +21,9 @@ set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${LINKER_FLAGS}")
 
 include_directories(whale/include)
 
-add_library(kuro SHARED
+add_library(killer SHARED
         main.cpp
-        BinaryReader.cpp
         Utils.cpp
         ElfImg.cpp)
 
-target_link_libraries(kuro whale android log)
+target_link_libraries(killer whale android log)

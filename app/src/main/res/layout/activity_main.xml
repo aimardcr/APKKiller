@@ -2,6 +2,94 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:padding="10dp">
 
+    <TextView
+        android:id="@+id/signature1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Signature (GET_SIGNATURES): "
+        android:textSize="12sp" />
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="5dp"/>
+
+    <TextView
+        android:id="@+id/signature2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Signature (GET_SIGNING_CERTIFICATES): "
+        android:textSize="12sp" />
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="5dp"/>
+
+    <TextView
+        android:id="@+id/apkPath1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="APK Path (getPackageInfo): "
+        android:textSize="12sp" />
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="5dp"/>
+
+    <TextView
+        android:id="@+id/apkPath2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="APK Path (getApplicationInfo): "
+        android:textSize="12sp" />
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="5dp"/>
+
+    <TextView
+        android:id="@+id/apkPath3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="APK Path (getPackageCodePath): "
+        android:textSize="12sp" />
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="5dp"/>
+
+    <TextView
+        android:id="@+id/apkPath4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="APK Path (getPackageResourcePath): "
+        android:textSize="12sp" />
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="5dp"/>
+
+    <TextView
+        android:id="@+id/apkcrc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="APK CRC: "
+        android:textSize="12sp" />
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="5dp"/>
+
+    <TextView
+        android:id="@+id/apkinstaller1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Installer (getInstallerPackageName): "
+        android:textSize="12sp" />
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="5dp"/>
+
+    <TextView
+        android:id="@+id/apkinstaller2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Installer (getInstallSourceInfo): "
+        android:textSize="12sp" />
 </LinearLayout>

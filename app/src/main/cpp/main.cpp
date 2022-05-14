@@ -3,8 +3,6 @@
 
 #include "APKKiller.h"
 
-extern jint Whale_OnLoad(JavaVM *vm, void *reserved);
-
 int RegisterFunctions(JNIEnv *env) {
     JNINativeMethod methods[] = {
             {"Start", "(Landroid/content/Context;)V", (void *) APKKill},
@@ -22,6 +20,8 @@ int RegisterFunctions(JNIEnv *env) {
 }
 
 JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
+    g_vm = vm;
+
     JNIEnv *env;
     if (vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6) != JNI_OK) {
         return -1;
@@ -31,5 +31,5 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         return -1;
     }
 
-    return Whale_OnLoad(vm, reserved);
+    return JNI_VERSION_1_6;
 }

@@ -28,17 +28,17 @@ struct NativeBridgeRuntimeCallbacks {
     //
     // Parameters:
     //   env [IN] pointer to JNIenv.
-    //   clazz [IN] Java class object.
+    //   classClass [IN] Java class object.
     // Returns:
     //   number of native methods.
     uint32_t (*getNativeMethodCount)(JNIEnv *env, jclass clazz);
 
-    // Get at most 'method_count' native methods for specified class 'clazz'. Results are outputed
+    // Get at most 'method_count' native methods for specified class 'classClass'. Results are outputed
     // via 'methods' [OUT]. The signature pointer in JNINativeMethod is reused as the method shorty.
     //
     // Parameters:
     //   env [IN] pointer to JNIenv.
-    //   clazz [IN] Java class object.
+    //   classClass [IN] Java class object.
     //   methods [OUT] array of method with the name, shorty, and fnPtr.
     //   method_count [IN] max number of elements in methods.
     // Returns:
