@@ -25,7 +25,7 @@
 
 #define apk_asset_path "original.apk" // assets/original.apk
 #define apk_fake_name "original.apk" // /data/data/<package_name>/cache/original.apk
-std::vector<std::vector<uint8_t>> apk_signatures {{}}; // if you fill this, it will ignore the m_APKSign from APKKiller.java
+std::vector<std::vector<uint8_t>> apk_signatures;
 
 JavaVM *g_vm;
 JNIEnv *g_env;
@@ -447,7 +447,7 @@ void patch_PackageManager(jobject obj) {
 }
 
 void APKKill(JNIEnv *env, jclass clazz, jobject context) {
-    env->PushLocalFrame(256); // We call this so that we don't need to manually delete the local refs
+    env->PushLocalFrame(64); // We call this so that we don't need to manually delete the local refs
 
     g_env = env;
     g_assetManager = AAssetManager_fromJava(env, env->CallObjectMethod(context, env->GetMethodID(env->FindClass("android/content/Context"), "getAssets", "()Landroid/content/res/AssetManager;")));
@@ -520,7 +520,7 @@ void APKKill(JNIEnv *env, jclass clazz, jobject context) {
 }
 
 jobject processInvoke(JNIEnv *env, jclass clazz, jobject method, jobjectArray args) {
-    env->PushLocalFrame(256);
+    env->PushLocalFrame(64);
 
     auto Integer_intValue = [&](jobject param) -> int {
         auto integerClass = env->FindClass("java/lang/Integer");
