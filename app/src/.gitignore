@@ -1,2 +1,2 @@
-androidTest
-test
+./androidTest/*
+./test/*
