@@ -1,5 +1,5 @@
-# APKKiller
-APKKiller is a wrapper to bypass android application integrity and signature check. APKKiller uses JNI Reflection also using some trick and hack to bypass hidden API restrictions. This method is made ONLY for educational purpose.
+# What is it?
+APKKiller is a method to bypass various android application security system check such as Signature Verification, Integrity Check, etc. APKKiller uses JNI & Reflection to bypass _Hidden API Restriction_, however there is no guarantee that APKKiller will bypass all android application security. APKKiller is made for educational purpose only, use with discretion.
 
 ## How does it work?
 When an android application is loaded, it stores various information regarding current running Application like App Name, Package Name, Signature, APK Path, etc.
