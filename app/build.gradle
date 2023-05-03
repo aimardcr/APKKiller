@@ -4,29 +4,35 @@ plugins {
 
 android {
     namespace 'com.kuro'
-    compileSdk 33
+    compileSdk 32
 
     defaultConfig {
         applicationId "com.kuro"
         minSdk 21
-        targetSdk 33
+        //noinspection OldTargetApi
+        targetSdk 32
         versionCode 1
         versionName "1.0"
 
         multiDexEnabled false
-    }
 
-    buildTypes {
-        release {
-            minifyEnabled false
-            //signingConfig signingConfigs.debug
+
+        ndk {
+            //noinspection ChromeOsAbiSupport
+            abiFilters 'x86_64', 'arm64-v8a'
         }
     }
 
     externalNativeBuild {
         cmake {
             path "src/main/cpp/CMakeLists.txt"
-            version "3.10.2"
+            version "3.22.1"
+        }
+    }
+
+    buildTypes {
+        release {
+            //signingConfig signingConfigs.debug
         }
     }
     
@@ -34,8 +40,4 @@ android {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
     }
-}
-
-dependencies {
-    implementation 'androidx.appcompat:appcompat:1.6.1'
 }
