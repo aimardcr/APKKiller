@@ -1,3 +1,5 @@
-.idea
-.grandle
-local.properties
+/.idea/
+/.gradle/
+/local.properties
+/app/build/
+/app/.cxx/

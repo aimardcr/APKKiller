@@ -2,17 +2,14 @@ package com.kuro.app;
 
 import android.app.Activity;
 import android.content.pm.InstallSourceInfo;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.kuro.R;
 
 import java.io.FileInputStream;
-import java.lang.reflect.Field;
 import java.security.MessageDigest;
 
 public class MainActivity extends Activity {
